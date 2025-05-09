@@ -10,9 +10,13 @@ TEST(SSD_TS, TC0)
 
 int main()
 {
-    std::cout << "Hello CRA !\n";
-
+#ifdef _DEBUG
     ::testing::InitGoogleMock();
     return RUN_ALL_TESTS();
+#else
+    std::cout << "Hello CRA !\n";
+
+    return 0;
+#endif
 }
 
