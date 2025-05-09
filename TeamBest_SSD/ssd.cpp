@@ -3,7 +3,9 @@
 void SSD::Initialize(const std::string& fileName) {
     std::ofstream outFile(fileName);
     if (outFile.is_open()) {
-        outFile << "example content\n";
+        for (int i = 0; i <= 99; ++i) {
+            outFile << i << " 0x00000000\n";
+        }
         outFile.close();
     }
 }
