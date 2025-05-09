@@ -1,9 +1,11 @@
 #include "ssd.h"
 
+const int FILESIZE = 99;
+
 void SSD::Initialize(const std::string& fileName) {
     std::ofstream outFile(fileName);
     if (outFile.is_open()) {
-        for (int i = 0; i <= 99; ++i) {
+        for (int i = 0; i <= FILESIZE; ++i) {
             outFile << i << " 0x00000000\n";
         }
         outFile.close();
