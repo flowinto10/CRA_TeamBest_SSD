@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
 
-class SSD
-{
+class SSD{
 public:
 	SSD() = default;
 
