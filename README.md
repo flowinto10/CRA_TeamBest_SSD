@@ -10,3 +10,15 @@ CRA 3차수 Team Best - SSD 팀 프로젝트
 - 중괄호는 함수 바로 옆에 시작 :
    void SetName(string str) {
    
+# Commit Message Guide
+-  [Feature or Refactor] 해당 Feature
+
+- 변경점  
+
+- 검증
+ 
+   [ ] Build
+
+   [ ] Regression Test Pass
+
+   [ ] 해당 기능 TC
