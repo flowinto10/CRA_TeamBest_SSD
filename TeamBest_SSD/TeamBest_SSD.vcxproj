@@ -144,6 +144,7 @@
     <ClInclude Include="ssd.h" />
     <ClInclude Include="ssd_controller.h" />
     <ClInclude Include="ssd_factory.h" />
+    <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
