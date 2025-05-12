@@ -9,6 +9,7 @@ SSDController::SSDController(std::shared_ptr<ISSD> ssdExecutor)
 
 bool SSDController::Run(const std::string& command) {
 	std::vector<std::string> tokens = CommandParser(command);
+    ConvertCommandToUpperCase(tokens[SSD_COMMAND_PARAM_INDEX::COMMAND_NAME]);
     if (!IsValidCommand(tokens)) return false;
 
     Execute(tokens);
@@ -40,14 +41,12 @@ std::vector<std::string> SSDController::CommandParser(
 }
 
 bool SSDController::IsValidCommand(const std::vector<std::string>& commandTokens) {
-    const std::string& executorName = commandTokens[SSD_COMMAND_PARAM_INDEX::EXECUTOR_NAME];
-    if (executorName != EXECUTOR_NAME) return false;
-
-    const std::string& commandName = commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND_NAME];
+    const std::string& commandName = 
+        BEST_UTILS::ToUpper(commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND_NAME]);
     if (commandName != READ_COMMAND_NAME &&
         commandName != WRITE_COMMAND_NAME ) return false;
 
-    size_t commandParamCount = commandTokens.size() - 2;
+    size_t commandParamCount = commandTokens.size() - 1;
     if (commandName == READ_COMMAND_NAME
         && commandParamCount != READ_COMMAND_PARAM_COUNT) return false;
 

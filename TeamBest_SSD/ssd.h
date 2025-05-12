@@ -53,7 +53,7 @@ private:
 	inline static const std::string NAND_FILE_PATH{"ssd_nand.txt"};
 	inline static const std::string OUTPUT_FILE_PATH{ "ssd_output.txt" };
 
-	const std::regex VALID_PATTERN{ "^0x[0-9A-F]{8}$" };;
+	const std::regex VALID_DATA_PATTERN{ "^0x[0-9A-Fa-f]{8}$" };;
 	inline static const std::string ERROR_MESSAGE{ "ERROR" };
 
 };
