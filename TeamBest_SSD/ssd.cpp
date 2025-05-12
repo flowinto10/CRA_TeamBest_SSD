@@ -22,13 +22,13 @@ void SSD::Initialize(const std::string& fileName) {
 }
 
 void SSD::Read(int lba) {
-    if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
-    return WriteValueToOutputFile(ReadValueAtAddress(lba));
+    if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    return ReadValueAtAddress(lba);
 }
 
 void SSD::Write(int lba, const std::string& value) {    
-    if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
-    if (!IsValidValue(value)) return WriteErrorMessageToOutputFile();
+    if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    if (!IsValidValue(value)) return WriteValueToOutputFile(ERROR_MESSAGE);
     if (!IsNandFileExist()) Initialize(NAND_FILE_PATH);
 
     UpdateValueAtAddress(lba, value);
@@ -53,17 +53,15 @@ std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line)
     return { std::stoi(readLba), readValue };
 }
 
-std::string  SSD::ReadValueAtAddress(int lba) {
-    std::ifstream file(NAND_FILE_PATH);  // 파일 열기
+void  SSD::ReadValueAtAddress(int lba) {
+    std::ifstream file(NAND_FILE_PATH);
     if (!file.is_open()) {
         std::cerr << "파일을 열 수 없습니다!" << NAND_FILE_PATH << '\n';
-        return "ERROR";
+        return WriteValueToOutputFile(ERROR_MESSAGE);
     }
 
-    std::string line;
-    int line_number = 0;
-    int readLba;
-    std::string readValue;
+    std::string line, readValue;
+    int line_number = 0, readLba;
 
     while (std::getline(file, line)) {
         if (line_number == lba) {
@@ -71,17 +69,16 @@ std::string  SSD::ReadValueAtAddress(int lba) {
             readLba = convertedLine.first;
             readValue = convertedLine.second;
             if (readLba != lba) {
-                std::cout << "파일에 다음 주소가 없습니다.: " << lba << "\n";
-                return "ERROR";
+                std::cout << "파일에 해당 주소가 없습니다.: " << lba << "\n";
+                return WriteValueToOutputFile(ERROR_MESSAGE);
             }
-            //WriteValueToOutputFile(readValue);
             break;
         }
         line_number++;
-    }
+    } 
 
     file.close();  // 파일 닫기
-    return readValue;
+    return WriteValueToOutputFile(readValue);
 }
 
 void SSD::WriteValueToOutputFile(const std::string& value) {
@@ -90,18 +87,8 @@ void SSD::WriteValueToOutputFile(const std::string& value) {
         std::cerr << "파일을 열 수 없습니다: " << OUTPUT_FILE_PATH << '\n';
         return;
     }
+
     outFile << value << '\n';
-    outFile.close();
-}
-
-void SSD::WriteErrorMessageToOutputFile() {
-    std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
-    if (!outFile) {
-        std::cerr << "파일을 열 수 없습니다: " << OUTPUT_FILE_PATH << '\n';
-        return;
-    }
-
-    outFile << WRITE_ERROR_MESSAGE << '\n';
     outFile.close();
 }
 
