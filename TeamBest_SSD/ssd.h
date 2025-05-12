@@ -6,13 +6,22 @@
 #include <string_view>
 #include <regex>
 
-class SSD{
+class ISSD {
+public:
+	virtual ~ISSD() {};
+
+	virtual void Read(int lba) = 0;
+	virtual void Write(int lba, const std::string& value) = 0;
+
+};
+
+class SSD : public ISSD{
 public:
 	SSD() = default;
 
 	void Initialize(const std::string& fileName);
-	void Read(int lba);
-	void Write(int lba, const std::string& value);
+	void Read(int lba) override;
+	void Write(int lba, const std::string& value) override;
 
 	void SetAddressRange(int addressMin, int addressMax);
 	std::pair<int, int> GetAddressRange( );
