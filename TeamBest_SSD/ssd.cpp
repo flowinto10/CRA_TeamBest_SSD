@@ -1,14 +1,19 @@
-#include "ssd.h"
+ï»¿#include "ssd.h"
 #include <iostream>
 #include <regex>
 
-const int FILESIZE = 99;
+const int MAX_LBA = 99;
+
+SSD::SSD() {
+    Initialize(NAND_FILE_PATH);
+    Initialize(OUTPUT_FILE_PATH);
+}
 
 void SSD::Initialize(const std::string& fileName) {
     std::ofstream outFile(fileName);
-    if (fileName == "ssd_nand.txt") {
+    if (fileName == NAND_FILE_PATH) {
         if (outFile.is_open()) {
-            for (int i = 0; i <= FILESIZE; ++i) {
+            for (int i = 0; i <= MAX_LBA; ++i) {
                 outFile << i << " 0x00000000\n";
             }
             outFile.close();
@@ -17,12 +22,13 @@ void SSD::Initialize(const std::string& fileName) {
 }
 
 void SSD::Read(int lba) {
-
+    if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    return ReadValueAtAddress(lba);
 }
 
 void SSD::Write(int lba, const std::string& value) {    
-    if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
-    if (!IsValidValue(value)) return WriteErrorMessageToOutputFile();
+    if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    if (!IsValidValue(value)) return WriteValueToOutputFile(ERROR_MESSAGE);
     if (!IsNandFileExist()) Initialize(NAND_FILE_PATH);
 
     UpdateValueAtAddress(lba, value);
@@ -40,21 +46,59 @@ bool SSD::IsNandFileExist() {
     return std::filesystem::exists(NAND_FILE_PATH);
 }
 
-void SSD::WriteErrorMessageToOutputFile() {
+std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line) {
+    size_t space_pos = line.find(' ');
+    if (space_pos == std::string::npos) {
+        throw std::invalid_argument("ì…ë ¥ ë¬¸ìì—´ì— ê³µë°±ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+    }
+    std::string readLba = line.substr(0, space_pos);
+    std::string readValue = line.substr(space_pos + 1);
+    return { std::stoi(readLba), readValue };
+}
+
+void  SSD::ReadValueAtAddress(int lba) {
+    std::ifstream file(NAND_FILE_PATH);
+    if (!file.is_open()) {
+        std::cerr << "íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤!" << NAND_FILE_PATH << '\n';
+        return WriteValueToOutputFile(ERROR_MESSAGE);
+    }
+
+    std::string line, readValue;
+    int line_number = 0, readLba;
+
+    while (std::getline(file, line)) {
+        if (line_number == lba) {
+            std::pair convertedLine = SplitLineToLbaAndValue(line);
+            readLba = convertedLine.first;
+            readValue = convertedLine.second;
+            if (readLba != lba) {
+                std::cout << "íŒŒì¼ì— í•´ë‹¹ ì£¼ì†Œê°€ ì—†ìŠµë‹ˆë‹¤.: " << lba << "\n";
+                return WriteValueToOutputFile(ERROR_MESSAGE);
+            }
+            break;
+        }
+        line_number++;
+    } 
+
+    file.close();  // íŒŒì¼ ë‹«ê¸°
+    return WriteValueToOutputFile(readValue);
+}
+
+void SSD::WriteValueToOutputFile(const std::string& value) {
     std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
     if (!outFile) {
-        std::cerr << "ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " << OUTPUT_FILE_PATH << '\n';
+        std::cerr << "íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " << OUTPUT_FILE_PATH << '\n';
         return;
     }
 
-    outFile << WRITE_ERROR_MESSAGE << '\n';
+    outFile << value << '\n';
     outFile.close();
 }
 
 void SSD::UpdateValueAtAddress(int lba, const std::string& value) {
     std::vector<std::string> entireData = ReadDataForEntireAddress();
     if (entireData.size() != GetEntireAddressSize()) {
-        std::cerr << "¸Ş¸ğ¸® Å©±â¿Í ÀĞÀº µ¥ÀÌÅÍÀÇ ¼ö°¡ ´Ù¸¨´Ï´Ù!\n";
+        std::cerr << "ë©”ëª¨ë¦¬ í¬ê¸°ì™€ ì½ì€ ë°ì´í„°ì˜ ìˆ˜ê°€ ë‹¤ë¦…ë‹ˆë‹¤!\n";
         return;
     }
 
@@ -69,7 +113,7 @@ std::vector<std::string> SSD::ReadDataForEntireAddress() {
 
     std::ifstream inFile(NAND_FILE_PATH);
     if (!inFile) {
-        std::cerr << "ÆÄÀÏ ¿­±â ½ÇÆĞ: " << NAND_FILE_PATH << '\n';
+        std::cerr << "íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨: " << NAND_FILE_PATH << '\n';
         return entireData;
     }
 

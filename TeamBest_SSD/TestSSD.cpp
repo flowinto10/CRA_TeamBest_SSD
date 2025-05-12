@@ -54,32 +54,30 @@ TEST(TestSSD, ContructorTest) {
 }
 
 TEST(TestSSD, NandFileExistsAfterInit) {
-    SSD app;
     const std::string filename = "ssd_nand.txt";
 
-    // ���� ����: ������ ������ ����
+    // 사전 정리: 파일이 있으면 삭제
     if (std::filesystem::exists(filename)) {
         std::filesystem::remove(filename);
     }
 
-    app.Initialize(filename);
+    SSD app;
 
-    // ����: ������ �����Ǿ����� Ȯ��
+    // 검증: 파일이 생성되었는지 확인
     EXPECT_TRUE(std::filesystem::exists(filename));
 }
 
 TEST(TestSSD, OutputFileExistsAfterInit) {
-    SSD app;
     const std::string filename = "ssd_output.txt";
 
-    // ���� ����: ������ ������ ����
+    // 사전 정리: 파일이 있으면 삭제
     if (std::filesystem::exists(filename)) {
         std::filesystem::remove(filename);
     }
 
-    app.Initialize(filename);
+    SSD app;
 
-    // ����: ������ �����Ǿ����� Ȯ��
+    // 검증: 파일이 생성되었는지 확인
     EXPECT_TRUE(std::filesystem::exists(filename));
 }
 
@@ -187,4 +185,32 @@ TEST(TestSSD, TestWriteWhenInvalidValue) {
         std::string line = ReadFileContent(outputFilePath);
         EXPECT_EQ("ERROR", line);
     }    
+}
+
+TEST(TestSSD, TestReadWhenInvalidLBA) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    ssd.Read(-1);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("ERROR", line);
+}
+
+TEST(TestSSD, TestReadWhenValidLBA) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    ssd.Read(0);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("0x00000000", line);
+}
+
+TEST(TestSSD, TestReadWhenValidLBA2) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    ssd.Write(1, "0x12345678");
+    ssd.Read(1);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("0x12345678", line);
 }

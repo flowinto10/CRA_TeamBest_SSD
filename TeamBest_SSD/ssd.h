@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <filesystem>
 #include <fstream>
@@ -17,9 +17,8 @@ public:
 
 class SSD : public ISSD{
 public:
-	SSD() = default;
+	SSD();
 
-	void Initialize(const std::string& fileName);
 	void Read(int lba) override;
 	void Write(int lba, const std::string& value) override;
 
@@ -27,6 +26,8 @@ public:
 	std::pair<int, int> GetAddressRange( );
 
 private:
+	void Initialize(const std::string& fileName);
+
 	bool IsNandFileExist();
 	bool IsValidAddress(int address);
 	bool IsValidValue(const std::string& value);	
@@ -35,9 +36,12 @@ private:
 	std::vector<std::string> ReadDataForEntireAddress();
 	void WriteDataToEntireAddress(std::vector<std::string>& values);
 
-	void WriteErrorMessageToOutputFile();
 	size_t GetEntireAddressSize();
 	std::string MakeDataAsSaveFormat(int address, const std::string& data);
+
+	std::pair<int, std::string> SplitLineToLbaAndValue(const std::string& line);
+	void ReadValueAtAddress(int lba);
+	void WriteValueToOutputFile(const std::string& value);
 
 private:
 	int addressMin{ ADDRESS_MIN_LIMIT };
@@ -50,7 +54,7 @@ private:
 	inline static const std::string OUTPUT_FILE_PATH{ "ssd_output.txt" };
 
 	const std::regex VALID_PATTERN{ "^0x[0-9A-F]{8}$" };;
-	inline static const std::string WRITE_ERROR_MESSAGE{ "ERROR" };
+	inline static const std::string ERROR_MESSAGE{ "ERROR" };
 
 };
 
