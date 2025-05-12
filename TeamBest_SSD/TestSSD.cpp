@@ -170,7 +170,6 @@ TEST(TestSSD, TestWriteWhenInvalidValue) {
         "0xFFFFFFFFFF",
         "",
         "0xF$$FFFFF",
-        "0xFFfFFFFF",
         "0xFF FFFFF",
         "0XFFFFFFFF",
         "OxFFFFFFFF",

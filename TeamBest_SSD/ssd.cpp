@@ -44,7 +44,7 @@ bool SSD::IsValidAddress(int address) {
 }
 
 bool SSD::IsValidValue(const std::string& value) {
-    return std::regex_match(value, VALID_PATTERN);
+    return std::regex_match(value, VALID_DATA_PATTERN);
 }
 
 bool SSD::IsNandFileExist() {

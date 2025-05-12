@@ -23,14 +23,9 @@ TEST(TestSSDController, ContructorTest) {
 
 TEST(TestSSDController, NonExistCommand) {
 	vector<string> commands = {
-		"sSd r 1",
-		"ss w 1",
-		"ssdr w 1",
-		"ssd r 1",
-		"ssd w 1",
-		"ssd RR 1",
-		"ssd A 1",
-		"ssd ! 1"
+		"RR 1",
+		"A 1",
+		"! 1"
 	};
 
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
@@ -43,10 +38,10 @@ TEST(TestSSDController, NonExistCommand) {
 
 TEST(TestSSDController, InvalidParametersCount) {
 	vector<string> commands = {
-		"ssd R",
-		"ssd R 1 2 3",
-		"ssd W",
-		"ssd W 1 2 3 4"
+		"R",
+		"R 1 2 3",
+		"W",
+		"W 1 2 3 4"
 	};
 
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
@@ -61,20 +56,39 @@ TEST(TestSSDController, ValidReadCommand) {
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
 	SSDController ssdController{ mockSSD };
 	
-	string command = { "ssd R 1" };
-	EXPECT_CALL(*mockSSD, Read(1)).Times(1);
-	
-	bool result = ssdController.Run(command);
-	EXPECT_EQ(true, result);
+	vector<string> commands = { 
+		"R 1",
+		"r 1"
+	};
+
+	for (const auto& command : commands) {
+		EXPECT_CALL(*mockSSD, Read(1)).Times(1);
+
+		bool result = ssdController.Run(command);
+		EXPECT_EQ(true, result);
+	}	
 }
 
 TEST(TestSSDController, ValidWriteCommand) {
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
 	SSDController ssdController{ mockSSD };
 
-	string command = { "ssd W 1 0xFFFFFF" };
-	EXPECT_CALL(*mockSSD, Write(1, "0xFFFFFF")).Times(1);
+	vector<string> commands = {
+		"W 1 0xFFFFFFFF",
+		"w 1 0xFFFFFFFF"
+	};
+
+	for (const auto& command : commands) {
+		EXPECT_CALL(*mockSSD, Write(1, "0xFFFFFFFF")).Times(1);
+
+		bool result = ssdController.Run(command);
+		EXPECT_EQ(true, result);
+	}
+
+	string command = { "w 1 0xffffffff" };
+	EXPECT_CALL(*mockSSD, Write(1, "0xffffffff")).Times(1);
 
 	bool result = ssdController.Run(command);
 	EXPECT_EQ(true, result);
+	
 }

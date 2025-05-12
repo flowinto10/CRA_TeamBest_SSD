@@ -15,8 +15,9 @@ int main(int argc, char* argv[])
     ::testing::InitGoogleMock();
     return RUN_ALL_TESTS();
 #else
+    std::string ssdFefaultType{ "SSD" };
     SSDFactory& factory = SSDFactory::getInstance();
-    std::shared_ptr<ISSD> ssdType = factory.createSSD(argv[1]);
+    std::shared_ptr<ISSD> ssdType = factory.createSSD(ssdFefaultType);
     if (ssdType == nullptr) return -1;
 
     SSDController ssdController{ ssdType };
