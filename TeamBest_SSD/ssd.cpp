@@ -1,14 +1,19 @@
-#include "ssd.h"
+ï»¿#include "ssd.h"
 #include <iostream>
 #include <regex>
 
-const int FILESIZE = 99;
+const int MAX_LBA = 99;
+
+SSD::SSD() {
+    Initialize(NAND_FILE_PATH);
+    Initialize(OUTPUT_FILE_PATH);
+}
 
 void SSD::Initialize(const std::string& fileName) {
     std::ofstream outFile(fileName);
-    if (fileName == "ssd_nand.txt") {
+    if (fileName == NAND_FILE_PATH) {
         if (outFile.is_open()) {
-            for (int i = 0; i <= FILESIZE; ++i) {
+            for (int i = 0; i <= MAX_LBA; ++i) {
                 outFile << i << " 0x00000000\n";
             }
             outFile.close();
@@ -43,7 +48,7 @@ bool SSD::IsNandFileExist() {
 void SSD::WriteErrorMessageToOutputFile() {
     std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
     if (!outFile) {
-        std::cerr << "ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " << OUTPUT_FILE_PATH << '\n';
+        std::cerr << "íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " << OUTPUT_FILE_PATH << '\n';
         return;
     }
 
@@ -54,7 +59,7 @@ void SSD::WriteErrorMessageToOutputFile() {
 void SSD::UpdateValueAtAddress(int lba, const std::string& value) {
     std::vector<std::string> entireData = ReadDataForEntireAddress();
     if (entireData.size() != GetEntireAddressSize()) {
-        std::cerr << "¸Þ¸ð¸® Å©±â¿Í ÀÐÀº µ¥ÀÌÅÍÀÇ ¼ö°¡ ´Ù¸¨´Ï´Ù!\n";
+        std::cerr << "ë©”ëª¨ë¦¬ í¬ê¸°ì™€ ì½ì€ ë°ì´í„°ì˜ ìˆ˜ê°€ ë‹¤ë¦…ë‹ˆë‹¤!\n";
         return;
     }
 
@@ -69,7 +74,7 @@ std::vector<std::string> SSD::ReadDataForEntireAddress() {
 
     std::ifstream inFile(NAND_FILE_PATH);
     if (!inFile) {
-        std::cerr << "ÆÄÀÏ ¿­±â ½ÇÆÐ: " << NAND_FILE_PATH << '\n';
+        std::cerr << "íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨: " << NAND_FILE_PATH << '\n';
         return entireData;
     }
 

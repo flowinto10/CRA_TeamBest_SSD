@@ -54,32 +54,30 @@ TEST(TestSSD, ContructorTest) {
 }
 
 TEST(TestSSD, NandFileExistsAfterInit) {
-    SSD app;
     const std::string filename = "ssd_nand.txt";
 
-    // ���� ����: ������ ������ ����
+    // 사전 정리: 파일이 있으면 삭제
     if (std::filesystem::exists(filename)) {
         std::filesystem::remove(filename);
     }
 
-    app.Initialize(filename);
+    SSD app;
 
-    // ����: ������ �����Ǿ����� Ȯ��
+    // 검증: 파일이 생성되었는지 확인
     EXPECT_TRUE(std::filesystem::exists(filename));
 }
 
 TEST(TestSSD, OutputFileExistsAfterInit) {
-    SSD app;
     const std::string filename = "ssd_output.txt";
 
-    // ���� ����: ������ ������ ����
+    // 사전 정리: 파일이 있으면 삭제
     if (std::filesystem::exists(filename)) {
         std::filesystem::remove(filename);
     }
 
-    app.Initialize(filename);
+    SSD app;
 
-    // ����: ������ �����Ǿ����� Ȯ��
+    // 검증: 파일이 생성되었는지 확인
     EXPECT_TRUE(std::filesystem::exists(filename));
 }
 

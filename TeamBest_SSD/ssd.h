@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <filesystem>
 #include <fstream>
@@ -17,9 +17,8 @@ public:
 
 class SSD : public ISSD{
 public:
-	SSD() = default;
+	SSD();
 
-	void Initialize(const std::string& fileName);
 	void Read(int lba) override;
 	void Write(int lba, const std::string& value) override;
 
@@ -27,6 +26,8 @@ public:
 	std::pair<int, int> GetAddressRange( );
 
 private:
+	void Initialize(const std::string& fileName);
+
 	bool IsNandFileExist();
 	bool IsValidAddress(int address);
 	bool IsValidValue(const std::string& value);	
