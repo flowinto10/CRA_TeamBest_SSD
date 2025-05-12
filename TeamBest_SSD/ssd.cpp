@@ -48,6 +48,9 @@ bool SSD::IsNandFileExist() {
 
 std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line) {
     size_t space_pos = line.find(' ');
+    if (space_pos == std::string::npos) {
+        throw std::invalid_argument("입력 문자열에 공백이 없습니다.\n");
+    }
     std::string readLba = line.substr(0, space_pos);
     std::string readValue = line.substr(space_pos + 1);
     return { std::stoi(readLba), readValue };
