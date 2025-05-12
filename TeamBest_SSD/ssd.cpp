@@ -10,15 +10,20 @@ SSD::SSD() {
 }
 
 void SSD::Initialize(const std::string& fileName) {
-    std::ofstream outFile(fileName);
     if (fileName == NAND_FILE_PATH) {
+        if (IsNandFileExist()) return;
+        std::ofstream outFile(fileName);
         if (outFile.is_open()) {
             for (int i = 0; i <= MAX_LBA; ++i) {
                 outFile << i << " 0x00000000\n";
             }
             outFile.close();
-        }
+        }        
     }
+    else {
+        std::ofstream outFile(fileName);
+    }
+    
 }
 
 void SSD::Read(int lba) {

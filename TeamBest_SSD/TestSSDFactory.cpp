@@ -20,6 +20,6 @@ TEST(TestSSDFactory, NonExistType) {
 TEST(TestSSDFactory, FactorySSDType) {
 	SSDFactory& factory = SSDFactory::getInstance();
 
-	std::shared_ptr<ISSD> ssdType = factory.createSSD("SSD");
+	std::shared_ptr<ISSD> ssdType = factory.createSSD("ssd");
 	EXPECT_EQ(typeid(SSD), typeid(*ssdType));
 }
