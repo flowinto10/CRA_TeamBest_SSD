@@ -1,4 +1,4 @@
-#include "ssd_controller.h"
+﻿#include "ssd_controller.h"
 #include <string>
 #include <vector>
 
@@ -40,8 +40,8 @@ std::vector<std::string> SSDController::CommandParser(
 }
 
 bool SSDController::IsValidCommand(const std::vector<std::string>& commandTokens) {
-    const std::string& ececutorName = commandTokens[SSD_COMMAND_PARAM_INDEX::EXECUTOR_NAME];
-    if (ececutorName != EXECUTOR_NAME) return false;
+    const std::string& executorName = commandTokens[SSD_COMMAND_PARAM_INDEX::EXECUTOR_NAME];
+    if (executorName != EXECUTOR_NAME) return false;
 
     const std::string& commandName = commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND_NAME];
     if (commandName != READ_COMMAND_NAME &&
