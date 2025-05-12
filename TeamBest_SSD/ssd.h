@@ -40,7 +40,9 @@ private:
 	size_t GetEntireAddressSize();
 	std::string MakeDataAsSaveFormat(int address, const std::string& data);
 
-	void WriteValueToOutputFile();
+	std::pair<int, std::string> SplitLineToLbaAndValue(const std::string& line);
+	std::string ReadValueAtAddress(int lba);
+	void WriteValueToOutputFile(const std::string& value);
 
 private:
 	int addressMin{ ADDRESS_MIN_LIMIT };

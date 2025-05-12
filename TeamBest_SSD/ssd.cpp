@@ -23,7 +23,7 @@ void SSD::Initialize(const std::string& fileName) {
 
 void SSD::Read(int lba) {
     if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
-    return WriteValueToOutputFile();
+    return WriteValueToOutputFile(ReadValueAtAddress(lba));
 }
 
 void SSD::Write(int lba, const std::string& value) {    
@@ -46,13 +46,51 @@ bool SSD::IsNandFileExist() {
     return std::filesystem::exists(NAND_FILE_PATH);
 }
 
-void SSD::WriteValueToOutputFile() {
+std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line) {
+    size_t space_pos = line.find(' ');
+    std::string readLba = line.substr(0, space_pos);
+    std::string readValue = line.substr(space_pos + 1);
+    return { std::stoi(readLba), readValue };
+}
+
+std::string  SSD::ReadValueAtAddress(int lba) {
+    std::ifstream file(NAND_FILE_PATH);  // 파일 열기
+    if (!file.is_open()) {
+        std::cerr << "파일을 열 수 없습니다!" << NAND_FILE_PATH << '\n';
+        return "ERROR";
+    }
+
+    std::string line;
+    int line_number = 0;
+    int readLba;
+    std::string readValue;
+
+    while (std::getline(file, line)) {
+        if (line_number == lba) {
+            std::pair convertedLine = SplitLineToLbaAndValue(line);
+            readLba = convertedLine.first;
+            readValue = convertedLine.second;
+            if (readLba != lba) {
+                std::cout << "파일에 다음 주소가 없습니다.: " << lba << "\n";
+                return "ERROR";
+            }
+            //WriteValueToOutputFile(readValue);
+            break;
+        }
+        line_number++;
+    }
+
+    file.close();  // 파일 닫기
+    return readValue;
+}
+
+void SSD::WriteValueToOutputFile(const std::string& value) {
     std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
     if (!outFile) {
         std::cerr << "파일을 열 수 없습니다: " << OUTPUT_FILE_PATH << '\n';
         return;
     }
-    outFile << "0x00000000" << '\n';
+    outFile << value << '\n';
     outFile.close();
 }
 
