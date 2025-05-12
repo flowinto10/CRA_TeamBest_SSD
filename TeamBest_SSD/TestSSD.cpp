@@ -195,3 +195,12 @@ TEST(TestSSD, TestReadWhenInvalidLBA) {
     std::string line = ReadFileContent(outputFilePath);
     EXPECT_EQ("ERROR", line);
 }
+
+TEST(TestSSD, TestReadWhenValidLBA) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    ssd.Read(0);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("0x00000000", line);
+}

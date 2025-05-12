@@ -23,6 +23,7 @@ void SSD::Initialize(const std::string& fileName) {
 
 void SSD::Read(int lba) {
     if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
+    return WriteValueToOutputFile();
 }
 
 void SSD::Write(int lba, const std::string& value) {    
@@ -43,6 +44,16 @@ bool SSD::IsValidValue(const std::string& value) {
 
 bool SSD::IsNandFileExist() {
     return std::filesystem::exists(NAND_FILE_PATH);
+}
+
+void SSD::WriteValueToOutputFile() {
+    std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
+    if (!outFile) {
+        std::cerr << "파일을 열 수 없습니다: " << OUTPUT_FILE_PATH << '\n';
+        return;
+    }
+    outFile << "0x00000000" << '\n';
+    outFile.close();
 }
 
 void SSD::WriteErrorMessageToOutputFile() {

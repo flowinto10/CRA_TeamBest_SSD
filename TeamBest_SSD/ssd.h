@@ -40,6 +40,8 @@ private:
 	size_t GetEntireAddressSize();
 	std::string MakeDataAsSaveFormat(int address, const std::string& data);
 
+	void WriteValueToOutputFile();
+
 private:
 	int addressMin{ ADDRESS_MIN_LIMIT };
 	int addressMax{ ADDRESS_MAX_LIMIT };
