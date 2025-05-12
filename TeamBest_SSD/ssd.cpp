@@ -22,7 +22,7 @@ void SSD::Initialize(const std::string& fileName) {
 }
 
 void SSD::Read(int lba) {
-
+    if (!IsValidAddress(lba)) return WriteErrorMessageToOutputFile();
 }
 
 void SSD::Write(int lba, const std::string& value) {    
