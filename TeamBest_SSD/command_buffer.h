@@ -26,8 +26,6 @@ private:
 
 	bool IsEmptyBuffer(const std::string& bufferName);
 	std::string GetBufferContent(std::string bufferName);
-	bool BufferExist();
-	bool IsCommand(std::string fileName);
 
 	int CountFilesInBuffer();
 	void MakeEmptyFiles();
