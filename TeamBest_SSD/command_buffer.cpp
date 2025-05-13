@@ -10,7 +10,8 @@ CommandBuffer::CommandBuffer() {
 }
 
 bool CommandBuffer::IsFull() {
-	return {};
+	std::vector<std::string> commands = ReadBuffers();
+	return commands.size() == MAX_BUFFER_SIZE;
 }
 
 bool CommandBuffer::BufferExist() {
