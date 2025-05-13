@@ -1,6 +1,8 @@
-#include "command_buffer.h"
+﻿#include "command_buffer.h"
 #include <string>
 #include <vector>
+#include <iostream>
+#include <filesystem>
 
 CommandBuffer::CommandBuffer() {
 
@@ -26,8 +28,15 @@ std::vector<std::string> CommandBuffer::ReadBuffers() {
 	return {};
 }
 
-void CommandBuffer::AppendCommand(std::string) {
+void CommandBuffer::AppendCommand(const std::string& command) {
+	if (IsFull()) return;
+	std::string emptyBuffer = GetFirstEmptyBuffer();
 
+#ifdef _DEBUG
+	std::cout << "Empty Buffer : " << emptyBuffer << std::endl;
+#endif
+
+	WriteCommandToBuffer(emptyBuffer, command);
 }
 
 void CommandBuffer::ApplyIgnoreStrategy() {
@@ -38,10 +47,49 @@ void CommandBuffer::ApplyMergeStrategy() {
 
 }
 
-bool CommandBuffer::IsEmptyBuffer(std::string bufferName) {
+std::string CommandBuffer::GetBufferContent(std::string bufferName) {
 	return {};
 }
 
-std::string CommandBuffer::GetBufferContent(std::string bufferName) {
-	return {};
+std::string CommandBuffer::GetFirstEmptyBuffer() {
+	std::string emptyBuffer{ "" };
+
+	if (!BufferDirectoryExist()) {
+#ifdef _DEBUG
+		std::cout << "Buffer Directory is Not Exist\n";
+#endif
+		return emptyBuffer;
+	}
+
+	namespace fs = std::filesystem;
+	try {		
+		for (const auto& entry : fs::directory_iterator(BUFFER_DIR_PATH)) {
+			if (fs::is_regular_file(entry.status())) {
+				std::string fileName = entry.path().filename().string();
+				if (IsEmptyBuffer(fileName)) return fileName;
+			}
+		}		
+	}
+	catch (const fs::filesystem_error& e) {
+		std::cerr << "파일 목록 검사 중 오류 발생: " << e.what() << '\n';
+	}
+
+	return emptyBuffer;
+}
+
+void CommandBuffer::WriteCommandToBuffer(
+	const std::string& emptyBuffer,
+	const std::string& command) {
+
+	std::string oldBufferPath = GetBufferFullPath(emptyBuffer);
+	std::string newBufferName = GetBufferIndexAtBufferName(emptyBuffer) + command;
+	std::string newBufferPath = GetBufferFullPath(newBufferName);
+
+	namespace fs = std::filesystem;
+	try {
+		fs::rename(oldBufferPath, newBufferPath);
+	}
+	catch (const fs::filesystem_error& e) {
+		std::cerr << "Buffer 이름 변경 실패: " << e.what() << '\n';
+	}
 }
