@@ -22,7 +22,10 @@ private:
 
 	bool IsEmptyBuffer(std::string bufferName);
 	std::string GetBufferContent(std::string bufferName);
+	bool BufferExist();
 
+	int CountFilesInBuffer();
+	void MakeEmptyFiles();
 
 private:
 	std::vector<std::string> buffers;

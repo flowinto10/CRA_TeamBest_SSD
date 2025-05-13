@@ -11,6 +11,10 @@ bool CommandBuffer::IsFull() {
 	return {};
 }
 
+bool CommandBuffer::BufferExist() {
+	return std::filesystem::exists(BUFFER_DIR_PATH);
+}
+
 std::vector<std::string> CommandBuffer::Flush() {
 	return {};
 }
@@ -19,32 +23,31 @@ std::string CommandBuffer::FastRead() {
 	return {};
 }
 
-void CommandBuffer::InitBuffers() {
-	// buffer 폴더가 없으면 생성
-	if (!std::filesystem::exists("buffer")) {
-		std::filesystem::create_directory("buffer");
-	}
-	// buffer 폴더 안에 있는 파일들의 개수를 셈
+int CommandBuffer::CountFilesInBuffer() {
 	int fileCount = 0;
-	for (const auto& entry : std::filesystem::directory_iterator("buffer")) {
+	for (const auto& entry : std::filesystem::directory_iterator(BUFFER_DIR_PATH)) {
 		if (std::filesystem::is_regular_file(entry)) {
 			fileCount++;
 		}
 	}
-	std::cout << "fileCount: " << fileCount << std::endl;
-	for (int i = fileCount+1; i <= 5; ++i) {
-		std::string fileName = "buffer/" + std::to_string(i) + "_empty";
-		std::cout << "fileName: " << fileName << std::endl;
+	return fileCount;
+}
+
+void CommandBuffer::MakeEmptyFiles() {
+	int fileCount = CountFilesInBuffer();
+	for (int i = fileCount + 1; i <= MAX_BUFFER_SIZE; ++i) {
+		std::string fileName = BUFFER_DIR_PATH + "/" + std::to_string(i) + "_" + EMPTY_BUFFER_NAME;
 		std::ofstream outFile(fileName);
-		if (outFile) {
-			//outFile << "This is example file " << i << std::endl;
-			outFile.close();
-			std::cout << fileName << " 파일을 생성했습니다.\n";
-		}
+		if (outFile) outFile.close();
 		else {
-			std::cout << fileName << " 파일을 생성하는 데 실패했습니다.\n";
+			std::cerr << "파일을 생성하는 데 실패했습니다!" << fileName << '\n';
 		}
 	}
+}
+
+void CommandBuffer::InitBuffers() {
+	if (!BufferExist())	std::filesystem::create_directory(BUFFER_DIR_PATH);
+	MakeEmptyFiles();
 }
 
 std::vector<std::string> CommandBuffer::ReadBuffers() {
