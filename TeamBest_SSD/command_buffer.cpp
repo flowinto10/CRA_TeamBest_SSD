@@ -14,7 +14,11 @@ bool CommandBuffer::IsFull() {
 }
 
 bool CommandBuffer::BufferExist() {
-	return std::filesystem::exists(BUFFER_DIR_PATH);
+	return std::filesystem::exists(BUFFER_DIR_PATH) && std::filesystem::is_directory(BUFFER_DIR_PATH);
+}
+
+bool CommandBuffer::IsCommand(std::string fileName) {
+	return fileName.find(DELIMITER + EMPTY_BUFFER_NAME) == std::string::npos;
 }
 
 std::vector<std::string> CommandBuffer::Flush() {
@@ -54,8 +58,40 @@ void CommandBuffer::InitBuffers() {
 	MakeEmptyFiles();
 }
 
+std::string CommandBuffer::removeIndex(const std::string& fileName) {
+	std::string command;
+	size_t pos = fileName.find(DELIMITER);
+	if (pos != std::string::npos) {
+		command = fileName.substr(pos + 1);
+	}
+	else
+		std::cerr << "Invalid fileName: " << fileName << '\n';
+	return command;
+}
+
+std::string CommandBuffer::MakeCommandFromFile(const std::filesystem::directory_entry& file) {
+	std::string fileName = "";
+	if (std::filesystem::is_regular_file(file)) {
+		fileName = file.path().filename().string();
+		if (IsCommand(fileName)) {
+			fileName = removeIndex(fileName);
+			return fileName;
+		}
+	}
+	return "";
+}
+
 std::vector<std::string> CommandBuffer::ReadBuffers() {
-	return {};
+	std::vector<std::string> commandList;
+	std::string command;
+	if (BufferExist()) {
+		for (const auto& file : std::filesystem::directory_iterator(BUFFER_DIR_PATH)) {
+			command = MakeCommandFromFile(file);
+			if (command == "") continue;
+			commandList.push_back(command);
+		}
+	}
+	return commandList;
 }
 
 void CommandBuffer::AppendCommand(const std::string& command) {

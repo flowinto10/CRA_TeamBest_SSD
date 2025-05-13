@@ -96,3 +96,89 @@ TEST(TestCommandBuffer, TestAppendCommand) {
 	EXPECT_EQ(true, addCommandCheck);
 
 }
+
+TEST(TestCommandBuffer, TestRead5Files) {
+	CommandBuffer buffer;
+	std::string BUFFER_DIR = "buffer";
+
+	if (std::filesystem::exists(BUFFER_DIR))
+		std::filesystem::remove_all(BUFFER_DIR);
+
+	if (!fs::exists(BUFFER_DIR)) {
+		fs::create_directory(BUFFER_DIR);
+	}
+	std::vector<std::string> bufferNames = {
+		{"1_W 0 0x12345678"},
+		{"2_E 3 4"},
+		{"3_E 20 1"},
+		{"4_E 30 1"},
+		{"5_E 40 1"}
+	};
+	for (const auto& bufferName : bufferNames) {
+		std::ofstream outFile(BUFFER_DIR + "/" + bufferName);
+		outFile.close();
+	}
+	std::vector<std::string> files = buffer.ReadBuffers();
+	std::vector<std::string> expectedFiles = { 
+		"W 0 0x12345678", 
+		"E 3 4",
+		"E 20 1",
+		"E 30 1",
+		"E 40 1"
+	};
+	EXPECT_EQ(files, expectedFiles);
+}
+
+TEST(TestCommandBuffer, TestRead2Files) {
+	CommandBuffer buffer;
+	std::string BUFFER_DIR = "buffer";
+
+	if (std::filesystem::exists(BUFFER_DIR))
+		std::filesystem::remove_all(BUFFER_DIR);
+
+	if (!fs::exists(BUFFER_DIR)) {
+		fs::create_directory(BUFFER_DIR);
+	}
+	std::vector<std::string> bufferNames = {
+		{"1_W 0 0x12345678"},
+		{"2_E 3 4"},
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	for (const auto& bufferName : bufferNames) {
+		std::ofstream outFile(BUFFER_DIR + "/" + bufferName);
+		outFile.close();
+	}
+	std::vector<std::string> files = buffer.ReadBuffers();
+	std::vector<std::string> expectedFiles = { 
+		"W 0 0x12345678",
+		"E 3 4" };
+	EXPECT_EQ(files, expectedFiles);
+}
+
+TEST(TestCommandBuffer, TestReadNoFiles) {
+	CommandBuffer buffer;
+	std::string BUFFER_DIR = "buffer";
+
+	if (std::filesystem::exists(BUFFER_DIR))
+		std::filesystem::remove_all(BUFFER_DIR);
+
+	if (!fs::exists(BUFFER_DIR)) {
+		fs::create_directory(BUFFER_DIR);
+	}
+	std::vector<std::string> bufferNames = {
+		{"1_empty"},
+		{"2_empty"},
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	for (const auto& bufferName : bufferNames) {
+		std::ofstream outFile(BUFFER_DIR + "/" + bufferName);
+		outFile.close();
+	}
+	std::vector<std::string> files = buffer.ReadBuffers();
+	std::vector<std::string> expectedFiles = { };
+	EXPECT_EQ(files, expectedFiles);
+}
