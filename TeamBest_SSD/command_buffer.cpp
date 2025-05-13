@@ -1,4 +1,6 @@
 ﻿#include "command_buffer.h"
+#include "util.h"
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -26,7 +28,18 @@ std::vector<std::string> CommandBuffer::Flush() {
 	return {};
 }
 
-std::string CommandBuffer::FastRead() {
+std::string CommandBuffer::FastRead(int targetAddress) {
+	std::vector<std::string> commandsInBuffer = ReadBuffers();
+
+	for (const auto& command : commandsInBuffer) {
+		auto tokens = BEST_UTILS::StringTokenizer(command);
+		std::string command = tokens[COMMAND_PARAM_INDEX_WRITE::COMMAND_NAME];
+		int addressInCommand = std::stoi(tokens[COMMAND_PARAM_INDEX_WRITE::ADDRESS]);
+		if (command == WRITE_COMMAND_NAME && targetAddress == addressInCommand) {
+			return tokens[COMMAND_PARAM_INDEX_WRITE::VALUE];
+		}	
+	}
+
 	return {};
 }
 

@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 {
 #ifdef _DEBUG
     ::testing::InitGoogleMock();
-    //::testing::GTEST_FLAG(filter) = "TestCommandBuffer.*";
+    ::testing::GTEST_FLAG(filter) = "TestCommandBuffer.*";
     return RUN_ALL_TESTS();
 #else
     std::string ssdFefaultType{ "SSD" };

@@ -6,6 +6,21 @@
 #include <filesystem>
 #include <regex>
 
+namespace COMMAND_PARAM_INDEX_WRITE {
+	enum COMMAND_PARAM_INDEX_WRITE {
+		COMMAND_NAME = 0,
+		ADDRESS,
+		VALUE
+	};
+}
+
+namespace COMMAND_PARAM_INDEX_ERASE {
+	enum COMMAND_PARAM_INDEX_ERASE {
+		COMMAND_NAME = 0,
+		ADDRESS,
+		SIZE
+	};
+}
 
 class CommandBuffer{
 public:
@@ -14,7 +29,7 @@ public:
 
 	bool IsFull();
 	std::vector<std::string> Flush();
-	std::string FastRead();
+	std::string FastRead(int address);
 	void AppendCommand(const std::string& command);
 	std::vector<std::string> ReadBuffers();
 
@@ -50,6 +65,8 @@ private:
 	inline static const std::string BUFFER_DIR_PATH{ "buffer" };
 	inline static const std::string EMPTY_BUFFER_NAME{ "empty" };
 	inline static const std::string DELIMITER{ "_" };
+
+	inline static const std::string WRITE_COMMAND_NAME = { "W" };
 
 
 };
