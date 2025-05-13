@@ -40,6 +40,12 @@ void SSD::Write(int lba, const std::string& value) {
     UpdateValueAtAddress(lba, value);
 }
 
+void SSD::Erase(int lba, int size) {
+    for (int i = lba; i < lba + size; ++i) {
+        Write(i, "0x00000000");
+    }
+}
+
 bool SSD::IsValidAddress(int address) {
     return (address >= addressMin) && (address <= addressMax);
 }

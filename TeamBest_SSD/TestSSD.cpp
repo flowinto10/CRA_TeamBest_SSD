@@ -213,3 +213,19 @@ TEST(TestSSD, TestReadWhenValidLBA2) {
     std::string line = ReadFileContent(outputFilePath);
     EXPECT_EQ("0x12345678", line);
 }
+
+TEST(TestSSD, TestEraseWhenValidLBAAndValidSize) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    int lba = 0, size = 10;
+    for (int i = 0; i <= 99; ++i) {
+        ssd.Write(i, "0x11111111");
+    }
+    ssd.Erase(lba, size);
+    for (int i = lba; i < lba + size; ++i) {
+        ssd.Read(i);
+        std::string line = ReadFileContent(outputFilePath);
+        EXPECT_EQ("0x00000000", line);
+    }
+
+}
