@@ -41,6 +41,7 @@ void SSD::Write(int lba, const std::string& value) {
 }
 
 void SSD::Erase(int lba, int size) {
+    if(size < 0 || size > 10) WriteValueToOutputFile(ERROR_MESSAGE);
     for (int i = lba; i < lba + size; ++i) {
         Write(i, "0x00000000");
     }

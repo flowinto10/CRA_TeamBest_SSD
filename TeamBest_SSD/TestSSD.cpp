@@ -217,6 +217,7 @@ TEST(TestSSD, TestReadWhenValidLBA2) {
 TEST(TestSSD, TestEraseWhenValidLBAAndValidSize) {
     SSD ssd;
     const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
     int lba = 0, size = 10;
     for (int i = 0; i <= 99; ++i) {
         ssd.Write(i, "0x11111111");
@@ -228,4 +229,34 @@ TEST(TestSSD, TestEraseWhenValidLBAAndValidSize) {
         EXPECT_EQ("0x00000000", line);
     }
 
+}
+
+TEST(TestSSD, TestEraseWhenInvalidLBAAndValidSize) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    int lba = -1, size = 10;
+    ssd.Erase(lba, size);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("ERROR", line);
+}
+
+TEST(TestSSD, TestEraseWhenValidLBAAndInvalidSize) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    int lba = 0, size = 11;
+    ssd.Erase(lba, size);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("ERROR", line);
+}
+
+TEST(TestSSD, TestEraseWhenInvalidLBAAndInvalidSize) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    int lba = -1, size = 11;
+    ssd.Erase(lba, size);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("ERROR", line);
 }
