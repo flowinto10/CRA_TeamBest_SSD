@@ -21,6 +21,7 @@ void SSD::Initialize(const std::string& fileName) {
         }        
     }
     else {
+        if (IsOutputFileExist()) return;
         std::ofstream outFile(fileName);
     }
     
@@ -49,6 +50,10 @@ bool SSD::IsValidValue(const std::string& value) {
 
 bool SSD::IsNandFileExist() {
     return std::filesystem::exists(NAND_FILE_PATH);
+}
+
+bool SSD::IsOutputFileExist() {
+    return std::filesystem::exists(OUTPUT_FILE_PATH);
 }
 
 std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line) {
