@@ -44,7 +44,7 @@ void SSD::Erase(int lba, int size) {
     if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
     if(!IsValidSIze(lba, size)) return WriteValueToOutputFile(ERROR_MESSAGE);
     for (int i = lba; i < lba + size; ++i) {
-        Write(i, "0x00000000");
+        UpdateValueAtAddress(i, "0x00000000");
     }
 }
 
