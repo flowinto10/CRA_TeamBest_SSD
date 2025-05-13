@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>ssd</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>ssd</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -129,10 +135,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="command_buffer.cpp" />
     <ClCompile Include="ssd.cpp" />
     <ClCompile Include="ssd_controller.cpp" />
     <ClCompile Include="ssd_factory.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TestCommandBuffer.cpp" />
     <ClCompile Include="TestSSD.cpp" />
     <ClCompile Include="TestSSDController.cpp" />
     <ClCompile Include="TestSSDFactory.cpp" />
@@ -141,6 +149,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="command_buffer.h" />
     <ClInclude Include="ssd.h" />
     <ClInclude Include="ssd_controller.h" />
     <ClInclude Include="ssd_factory.h" />
