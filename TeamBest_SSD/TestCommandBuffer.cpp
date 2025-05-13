@@ -1,6 +1,5 @@
 ﻿#include "gmock/gmock.h"
 #include "command_buffer.h"
-
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -8,8 +7,19 @@
 #include <string>
 #include <algorithm>
 
+
 using namespace testing;
 namespace fs = std::filesystem;
+
+
+int countFilesInBuffer() {
+	int count = 0;
+	for (const auto& entry : std::filesystem::directory_iterator("buffer")) {
+		if (std::filesystem::is_regular_file(entry)) {
+			++count;
+		}
+	}
+	return count;
 
 std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 	std::vector<std::string> fileList;
@@ -28,12 +38,28 @@ std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 	}
 
 	return fileList;
+
 }
 
 TEST(TestCommandBuffer, ContructorTest) {
 	EXPECT_NO_THROW(std::shared_ptr<CommandBuffer> buffer 
 		= std::make_shared<CommandBuffer>());
 }
+
+
+TEST(TestCommandBuffer, BufferExistsAfterInit){
+	const std::string dirName = "buffer";
+	if (std::filesystem::exists(dirName))
+		std::filesystem::remove_all(dirName);
+	CommandBuffer buffer;
+	EXPECT_TRUE(std::filesystem::exists(dirName));
+}
+
+TEST(TestCommandBuffer, FilesExistAfterInit) {
+	const std::string dirName = "buffer";
+	CommandBuffer buffer;
+	int cnt = countFilesInBuffer();
+	EXPECT_EQ(cnt, 5);
 
 TEST(TestCommandBuffer, TestAppendCommand) {
 	std::string BUFFER_DIR = "buffer";
@@ -61,4 +87,5 @@ TEST(TestCommandBuffer, TestAppendCommand) {
 	std::vector<std::string> files = GetFilesInDirectory(BUFFER_DIR);
 	bool addCommandCheck = (std::find(files.begin(), files.end(), newBufferName) != files.end());
 	EXPECT_EQ(true, addCommandCheck);
+
 }

@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
+#include <fstream>
 #include <iostream>
 #include <filesystem>
+
 
 class CommandBuffer{
 public:
@@ -22,6 +24,11 @@ private:
 
 	bool IsEmptyBuffer(const std::string& bufferName);
 	std::string GetBufferContent(std::string bufferName);
+	bool BufferExist();
+
+	int CountFilesInBuffer();
+	void MakeEmptyFiles();
+
 	std::string GetFirstEmptyBuffer();
 	void WriteCommandToBuffer(
 		const std::string& emptyBuffer, 
@@ -29,6 +36,7 @@ private:
 	bool BufferDirectoryExist();
 	std::string GetBufferFullPath(const std::string & buffer);
 	std::string GetBufferIndexAtBufferName(const std::string& bufferName);
+
 
 private:
 	std::vector<std::string> buffers;
