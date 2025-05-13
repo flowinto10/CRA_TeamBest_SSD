@@ -34,6 +34,7 @@ private:
 	bool IsOutputFileExist();
 	bool IsValidAddress(int address);
 	bool IsValidValue(const std::string& value);	
+	bool IsValidSIze(int lba, int size);
 	
 	void UpdateValueAtAddress(int lba, const std::string& value);
 	std::vector<std::string> ReadDataForEntireAddress();
@@ -52,6 +53,7 @@ private:
 
 	static constexpr int ADDRESS_MIN_LIMIT = 0;
 	static constexpr int ADDRESS_MAX_LIMIT = 99;
+	static constexpr int ERASE_SIZE_LIMIT = 10;
 
 	inline static const std::string NAND_FILE_PATH{"ssd_nand.txt"};
 	inline static const std::string OUTPUT_FILE_PATH{ "ssd_output.txt" };

@@ -260,3 +260,13 @@ TEST(TestSSD, TestEraseWhenInvalidLBAAndInvalidSize) {
     std::string line = ReadFileContent(outputFilePath);
     EXPECT_EQ("ERROR", line);
 }
+
+TEST(TestSSD, TestEraseWhenValidLBAAndValidSizeButFail) {
+    SSD ssd;
+    const std::string outputFilePath = "ssd_output.txt";
+    ClearFileContent(outputFilePath);
+    int lba = 91, size = 10;
+    ssd.Erase(lba, size);
+    std::string line = ReadFileContent(outputFilePath);
+    EXPECT_EQ("ERROR", line);
+}
