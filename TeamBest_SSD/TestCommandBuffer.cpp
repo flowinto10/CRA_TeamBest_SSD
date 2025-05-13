@@ -290,3 +290,39 @@ TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable) {
 	std::string expected{ "0x12345678" };
 	EXPECT_EQ(expected, value);
 }
+
+TEST(TestCommandBuffer, TestFlushWhenBufferEmpty) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	CommandBuffer buffers;	
+	std::vector<std::string> commandBuffers = buffers.Flush();
+
+	std::vector<std::string> expected{};
+	EXPECT_EQ(expected, commandBuffers);
+}
+
+TEST(TestCommandBuffer, TestFlushWhenBufferNotEmpty) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	std::vector<std::string> commandBuffers = buffers.Flush();
+
+	std::vector<std::string> expected{
+		{"E 3 4"},
+		{"W 72 0x12345678" }
+	};
+	EXPECT_EQ(expected, commandBuffers);
+}

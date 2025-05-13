@@ -54,6 +54,7 @@ private:
 	std::string GetBufferIndexAtBufferName(const std::string& bufferName);
 	std::string MakeCommandFromFile(const std::filesystem::directory_entry& file);
 	std::string removeIndex(const std::string& fileName);
+	void RemoveBufferDirectory();
 
 
 private:
@@ -91,4 +92,8 @@ inline std::string CommandBuffer::GetBufferIndexAtBufferName(const std::string& 
 		return bufferName.substr(0, pos + 1);
 	}
 	return "";		
+}
+
+inline void CommandBuffer::RemoveBufferDirectory() {
+	std::filesystem::remove_all(BUFFER_DIR_PATH);
 }
