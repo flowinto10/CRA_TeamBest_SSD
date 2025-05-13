@@ -42,7 +42,9 @@ void CommandBuffer::MakeEmptyFiles() {
 		std::ofstream outFile(fileName);
 		if (outFile) outFile.close();
 		else {
+#ifdef _DEBUG
 			std::cerr << "파일을 생성하는 데 실패했습니다!" << fileName << '\n';
+#endif	
 		}
 	}
 }
@@ -99,7 +101,9 @@ std::string CommandBuffer::GetFirstEmptyBuffer() {
 		}		
 	}
 	catch (const fs::filesystem_error& e) {
+#ifdef _DEBUG
 		std::cerr << "파일 목록 검사 중 오류 발생: " << e.what() << '\n';
+#endif
 	}
 
 	return emptyBuffer;
@@ -118,6 +122,8 @@ void CommandBuffer::WriteCommandToBuffer(
 		fs::rename(oldBufferPath, newBufferPath);
 	}
 	catch (const fs::filesystem_error& e) {
+#ifdef _DEBUG
 		std::cerr << "Buffer 이름 변경 실패: " << e.what() << '\n';
+#endif
 	}
 }

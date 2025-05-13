@@ -35,7 +35,9 @@ std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 		}
 	}
 	catch (const fs::filesystem_error& e) {
+#ifdef _DEBUG
 		std::cerr << "파일 목록 검사 중 오류 발생: " << e.what() << '\n';
+#endif
 	}
 
 	return fileList;

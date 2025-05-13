@@ -82,7 +82,9 @@ std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line)
 void  SSD::ReadValueAtAddress(int lba) {
     std::ifstream file(NAND_FILE_PATH);
     if (!file.is_open()) {
+#ifdef _DEBUG
         std::cerr << "파일을 열 수 없습니다!" << NAND_FILE_PATH << '\n';
+#endif 
         return WriteValueToOutputFile(ERROR_MESSAGE);
     }
 
@@ -95,7 +97,9 @@ void  SSD::ReadValueAtAddress(int lba) {
             readLba = convertedLine.first;
             readValue = convertedLine.second;
             if (readLba != lba) {
+#ifdef _DEBUG
                 std::cout << "파일에 해당 주소가 없습니다.: " << lba << "\n";
+#endif
                 return WriteValueToOutputFile(ERROR_MESSAGE);
             }
             break;
@@ -110,7 +114,9 @@ void  SSD::ReadValueAtAddress(int lba) {
 void SSD::WriteValueToOutputFile(const std::string& value) {
     std::ofstream outFile(OUTPUT_FILE_PATH, std::ios::trunc);
     if (!outFile) {
+#ifdef _DEBUG
         std::cerr << "파일을 열 수 없습니다: " << OUTPUT_FILE_PATH << '\n';
+#endif
         return;
     }
 
@@ -121,7 +127,9 @@ void SSD::WriteValueToOutputFile(const std::string& value) {
 void SSD::UpdateValueAtAddress(int lba, const std::string& value) {
     std::vector<std::string> entireData = ReadDataForEntireAddress();
     if (entireData.size() != GetEntireAddressSize()) {
+#ifdef _DEBUG
         std::cerr << "메모리 크기와 읽은 데이터의 수가 다릅니다!\n";
+#endif
         return;
     }
 
@@ -136,7 +144,9 @@ std::vector<std::string> SSD::ReadDataForEntireAddress() {
 
     std::ifstream inFile(NAND_FILE_PATH);
     if (!inFile) {
+#ifdef _DEBUG
         std::cerr << "파일 열기 실패: " << NAND_FILE_PATH << '\n';
+#endif
         return entireData;
     }
 
