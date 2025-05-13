@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+#data-file
+buffer
+buffer*
+buffer/*
+ssd_nand.txt
+ssd_output.txt
+
 # User-specific files
 *.rsuser
 *.suo
