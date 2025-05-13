@@ -15,10 +15,11 @@ public:
 	std::vector<std::string> Flush();
 	std::string FastRead();
 	void AppendCommand(const std::string& command);
+	std::vector<std::string> ReadBuffers();
 
 private:
 	void InitBuffers();
-	std::vector<std::string> ReadBuffers();	
+	
 	void ApplyIgnoreStrategy();
 	void ApplyMergeStrategy();
 

@@ -53,7 +53,20 @@ void CommandBuffer::InitBuffers() {
 }
 
 std::vector<std::string> CommandBuffer::ReadBuffers() {
-	return {};
+	std::vector<std::string> fileNames;
+	if (std::filesystem::exists("buffer") && std::filesystem::is_directory("buffer")) {
+		for (const auto& entry : std::filesystem::directory_iterator("buffer")) {
+			if (std::filesystem::is_regular_file(entry)) {
+				std::string fileName = entry.path().filename().string();
+
+				// 파일 이름이 *_empty 형식이 아니면 vector에 추가
+				if (fileName.find("_empty") == std::string::npos) {
+					fileNames.push_back(fileName);
+				}
+			}
+		}
+	}
+	return fileNames;
 }
 
 void CommandBuffer::AppendCommand(const std::string& command) {
