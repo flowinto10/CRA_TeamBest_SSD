@@ -118,11 +118,11 @@ TEST(TestCommandBuffer, TestRead5Files) {
 	}
 	std::vector<std::string> files = buffer.ReadBuffers();
 	std::vector<std::string> expectedFiles = { 
-		"1_W 0 0x12345678", 
-		"2_E 3 4",
-		"3_E 20 1",
-		"4_E 30 1",
-		"5_E 40 1"
+		"W 0 0x12345678", 
+		"E 3 4",
+		"E 20 1",
+		"E 30 1",
+		"E 40 1"
 	};
 	EXPECT_EQ(files, expectedFiles);
 }
@@ -149,7 +149,9 @@ TEST(TestCommandBuffer, TestRead2Files) {
 		outFile.close();
 	}
 	std::vector<std::string> files = buffer.ReadBuffers();
-	std::vector<std::string> expectedFiles = { "1_W 0 0x12345678", "2_E 3 4" };
+	std::vector<std::string> expectedFiles = { 
+		"W 0 0x12345678",
+		"E 3 4" };
 	EXPECT_EQ(files, expectedFiles);
 }
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <regex>
 
 
 class CommandBuffer{
@@ -26,6 +27,7 @@ private:
 	bool IsEmptyBuffer(const std::string& bufferName);
 	std::string GetBufferContent(std::string bufferName);
 	bool BufferExist();
+	bool IsCommand(std::string fileName);
 
 	int CountFilesInBuffer();
 	void MakeEmptyFiles();
@@ -37,6 +39,8 @@ private:
 	bool BufferDirectoryExist();
 	std::string GetBufferFullPath(const std::string & buffer);
 	std::string GetBufferIndexAtBufferName(const std::string& bufferName);
+	std::string MakeCommandFromFile(const std::filesystem::directory_entry& file);
+	std::string removeIndex(const std::string& fileName);
 
 
 private:
@@ -45,6 +49,7 @@ private:
 	inline static constexpr int MAX_BUFFER_SIZE = 5;
 	inline static const std::string BUFFER_DIR_PATH{ "buffer" };
 	inline static const std::string EMPTY_BUFFER_NAME{ "empty" };
+	inline static const std::string DELIMITER{ "_" };
 
 
 };
