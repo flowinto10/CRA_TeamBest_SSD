@@ -20,6 +20,7 @@ int countFilesInBuffer() {
 		}
 	}
 	return count;
+}
 
 std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 	std::vector<std::string> fileList;
@@ -60,9 +61,13 @@ TEST(TestCommandBuffer, FilesExistAfterInit) {
 	CommandBuffer buffer;
 	int cnt = countFilesInBuffer();
 	EXPECT_EQ(cnt, 5);
+}
 
 TEST(TestCommandBuffer, TestAppendCommand) {
 	std::string BUFFER_DIR = "buffer";
+
+	if (std::filesystem::exists(BUFFER_DIR))
+		std::filesystem::remove_all(BUFFER_DIR);
 
 	if (!fs::exists(BUFFER_DIR)) {
 		fs::create_directory(BUFFER_DIR);
