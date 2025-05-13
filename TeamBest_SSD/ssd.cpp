@@ -40,6 +40,14 @@ void SSD::Write(int lba, const std::string& value) {
     UpdateValueAtAddress(lba, value);
 }
 
+void SSD::Erase(int lba, int size) {
+    if (!IsValidAddress(lba)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    if(!IsValidSIze(lba, size)) return WriteValueToOutputFile(ERROR_MESSAGE);
+    for (int i = lba; i < lba + size; ++i) {
+        UpdateValueAtAddress(i, "0x00000000");
+    }
+}
+
 bool SSD::IsValidAddress(int address) {
     return (address >= addressMin) && (address <= addressMax);
 }
@@ -54,6 +62,11 @@ bool SSD::IsNandFileExist() {
 
 bool SSD::IsOutputFileExist() {
     return std::filesystem::exists(OUTPUT_FILE_PATH);
+}
+
+bool SSD::IsValidSIze(int lba, int size) {
+    return size >= 0 && size <= ERASE_SIZE_LIMIT
+            && IsValidAddress(lba + size - 1);
 }
 
 std::pair<int, std::string> SSD::SplitLineToLbaAndValue(const std::string& line) {
@@ -90,7 +103,7 @@ void  SSD::ReadValueAtAddress(int lba) {
         line_number++;
     } 
 
-    file.close();  // 파일 닫기
+    file.close();
     return WriteValueToOutputFile(readValue);
 }
 

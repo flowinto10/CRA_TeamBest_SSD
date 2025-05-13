@@ -1,4 +1,4 @@
-#include "gmock/gmock.h"
+﻿#include "gmock/gmock.h"
 #include "ssd_controller.h"
 #include "ssd.h"
 
@@ -13,6 +13,7 @@ class MockSSD : public ISSD{
 public:
 	MOCK_METHOD(void, Write, (int, const std::string&), (override));
 	MOCK_METHOD(void, Read, (int), (override));
+	MOCK_METHOD(void, Erase, (int, int), (override));
 };
 
 TEST(TestSSDController, ContructorTest) {
