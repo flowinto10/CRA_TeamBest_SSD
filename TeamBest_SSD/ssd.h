@@ -29,6 +29,7 @@ private:
 	void Initialize(const std::string& fileName);
 
 	bool IsNandFileExist();
+	bool IsOutputFileExist();
 	bool IsValidAddress(int address);
 	bool IsValidValue(const std::string& value);	
 	
