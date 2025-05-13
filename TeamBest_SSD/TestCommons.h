@@ -4,6 +4,7 @@
 #include <vector>
 
 void ClearFileContent(const std::string& path);
+void RemoveFile(const std::string& path);
 std::string ReadFileContent(const std::string& path);
 bool ContainsStringInFile(const std::string& filePath, const std::string& keyword);
 int countFilesInBuffer();

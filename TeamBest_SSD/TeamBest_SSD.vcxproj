@@ -145,6 +145,7 @@
     <ClCompile Include="TestSSD.cpp" />
     <ClCompile Include="TestSSDController.cpp" />
     <ClCompile Include="TestSSDFactory.cpp" />
+    <ClCompile Include="TestTntegration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

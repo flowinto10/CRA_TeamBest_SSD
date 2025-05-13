@@ -18,6 +18,13 @@ void ClearFileContent(const std::string& path) {
 	file.close();
 }
 
+void RemoveFile(const std::string& path) {
+	if (fs::exists(path)) {
+		if (fs::remove(path)) {
+		}
+	}
+}
+
 std::string ReadFileContent(const std::string& path) {
 	std::ifstream file(path);
 	if (!file.is_open()) {

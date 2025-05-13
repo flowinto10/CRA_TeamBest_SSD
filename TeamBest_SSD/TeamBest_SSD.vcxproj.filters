@@ -54,6 +54,9 @@
     <ClCompile Include="TestCommons.cpp">
       <Filter>TEST</Filter>
     </ClCompile>
+    <ClCompile Include="TestTntegration.cpp">
+      <Filter>TEST</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
