@@ -1,9 +1,9 @@
-#include "command_buffer.h"
+﻿#include "command_buffer.h"
 #include <string>
 #include <vector>
 
 CommandBuffer::CommandBuffer() {
-
+	InitBuffers();
 }
 
 bool CommandBuffer::IsFull() {
@@ -19,7 +19,10 @@ std::string CommandBuffer::FastRead() {
 }
 
 void CommandBuffer::InitBuffers() {
-
+	// buffer 폴더가 없으면 생성
+	if (!std::filesystem::exists("buffer")) {
+		std::filesystem::create_directory("buffer");
+	}
 }
 
 std::vector<std::string> CommandBuffer::ReadBuffers() {
