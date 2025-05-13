@@ -51,6 +51,9 @@
     <ClCompile Include="TestCommandBuffer.cpp">
       <Filter>TEST</Filter>
     </ClCompile>
+    <ClCompile Include="TestCommons.cpp">
+      <Filter>TEST</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="util.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestCommons.h">
+      <Filter>TEST</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

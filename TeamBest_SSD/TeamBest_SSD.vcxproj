@@ -141,6 +141,7 @@
     <ClCompile Include="ssd_factory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCommandBuffer.cpp" />
+    <ClCompile Include="TestCommons.cpp" />
     <ClCompile Include="TestSSD.cpp" />
     <ClCompile Include="TestSSDController.cpp" />
     <ClCompile Include="TestSSDFactory.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="ssd.h" />
     <ClInclude Include="ssd_controller.h" />
     <ClInclude Include="ssd_factory.h" />
+    <ClInclude Include="TestCommons.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
