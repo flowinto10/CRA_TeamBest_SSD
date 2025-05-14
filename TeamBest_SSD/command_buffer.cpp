@@ -109,6 +109,9 @@ void CommandBuffer::AppendCommand(const std::string& command) {
 	if (IsFull()) return;
 
 	std::vector<std::string> buffer = ApplyIgnoreStrategy(command);
+	if (buffer.back() == command && buffer.size() > 1) {
+		buffer = ApplyMergeStrategy(buffer, command);
+	}
 	ClearBuffer();
 	for (auto cmd : buffer) {
 		std::string emptyBuffer = GetFirstEmptyBuffer();
@@ -151,8 +154,30 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 	return buffer;
 }
 
-void CommandBuffer::ApplyMergeStrategy() {
+std::vector<std::string> CommandBuffer::ApplyMergeStrategy(std::vector<std::string>& buffer, const std::string& command) {
+	std::vector<std::string> values = SplitValuesFromCommand(command);
+	std::string cmd = values[0], arg1 = values[2];
+	int lba = std::stoi(values[1]);
+	if (cmd != "E") return buffer;
 
+	auto it = buffer.rbegin() + 1;
+	values = SplitValuesFromCommand(*it);
+	std::string bufCmd = values[0], bufArg1 = values[2];
+	int bufLba = std::stoi(values[1]);
+	if (bufCmd != "E") return buffer;
+
+	auto [unifiedRangeStart, unifiedRangeEnd] = getMinMax(lba, lba + std::stoi(arg1) - 1, bufLba, bufLba + std::stoi(bufArg1) - 1);
+	if (unifiedRangeEnd - unifiedRangeStart + 1 > 10) return buffer;
+	buffer.pop_back();
+	buffer.pop_back();
+	buffer.push_back("E "+ std::to_string(unifiedRangeStart)+" "+ std::to_string(unifiedRangeEnd - unifiedRangeStart + 1));
+	return buffer;
+}
+
+std::pair<int, int> CommandBuffer::getMinMax(int range1Start, int range1End, int range2Start, int range2end) {
+	std::vector<int> vec = { range1Start, range1End, range2Start, range2end };
+	std::sort(vec.begin(), vec.end());
+	return { vec[0], vec[3] };
 }
 
 std::string CommandBuffer::GetBufferContent(std::string bufferName) {

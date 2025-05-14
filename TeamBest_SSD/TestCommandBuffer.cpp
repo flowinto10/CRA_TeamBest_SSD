@@ -423,3 +423,53 @@ TEST(TestCommandBuffer, TestEraseCommandIsIgnoredWhenRangeIsIncluded2) {
 	};
 	EXPECT_EQ(cmds, expectedCmds);
 }
+
+TEST(TestCommandBuffer, TestMergeWhenMergeIsPossible1) {
+	std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 23 0x12345678" },
+		{"3_E 73 4"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffer;
+	const std::string& command = "E 75 5";
+	buffer.AppendCommand(command);
+	std::vector<std::string> cmds = buffer.ReadBuffers();
+
+	std::vector<std::string> expectedCmds = {
+		"E 3 4",
+		"W 23 0x12345678",
+		"E 73 7"
+	};
+	EXPECT_EQ(cmds, expectedCmds);
+}
+
+TEST(TestCommandBuffer, TestMergeWhenMergeIsPossible2) {
+	std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 23 0x12345678" },
+		{"3_E 75 5"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffer;
+	const std::string& command = "E 73 4";
+	buffer.AppendCommand(command);
+	std::vector<std::string> cmds = buffer.ReadBuffers();
+
+	std::vector<std::string> expectedCmds = {
+		"E 3 4",
+		"W 23 0x12345678",
+		"E 73 7"
+	};
+	EXPECT_EQ(cmds, expectedCmds);
+}

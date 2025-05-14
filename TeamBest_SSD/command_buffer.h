@@ -38,7 +38,7 @@ public:
 private:
 	void InitBuffers();
 	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
-	void ApplyMergeStrategy();
+	std::vector<std::string> ApplyMergeStrategy(std::vector<std::string>& buffer, const std::string& command);
 
 	bool IsEmptyBuffer(const std::string& bufferName);
 	std::string GetBufferContent(std::string bufferName);
@@ -71,6 +71,7 @@ private:
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
 	void ClearBuffer();
+	std::pair<int, int> getMinMax(int range1Start, int range1End, int range2Start, int range2end);
 
 private:
 	std::vector<std::string> buffers;
