@@ -1,4 +1,4 @@
-#include "gmock/gmock.h"
+﻿#include "gmock/gmock.h"
 #include "TestCommons.h"
 
 #include "ssd.h"
@@ -244,5 +244,48 @@ TEST(TestIntegration, ReadTestWithPartialFastRead) {
 		string cmd = "R " + to_string(index);
 		ssdController.Run(cmd);
 		EXPECT_EQ(expected, ReadFileContent(SSD_OUTPUT_FILENAME));
+	}
+}
+
+TEST(TestIntegration, WriteTestIncludeBufferFullState) {
+	const std::string BUFFER_DIR = "buffer";
+	const std::string SSD_NAND_FILENAME = "ssd_nand.txt";
+	const std::string SSD_OUTPUT_FILENAME = "ssd_output.txt";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	RemoveFile(SSD_NAND_FILENAME);
+
+	std::shared_ptr<ISSD> ssd = std::make_shared<SSD>();
+	SSDController ssdController{ ssd };
+
+	vector<string> writeParams = {
+		{"1 0x12345678" },
+		{"2 0xFAFAFAFA" },
+		{"3 0x1A2B3C3D" },
+		{"4 0x98765432" },
+		{"5 0x01020304" }
+	};
+
+	vector<string> writeCommands = {
+		{"W 1 0x12345678" },
+		{"W 2 0xFAFAFAFA" },
+		{"W 3 0x1A2B3C3D" },
+		{"W 4 0x98765432" },
+		{"W 5 0x01020304" }
+	};
+
+	for (const auto& command : writeCommands) {
+		ssdController.Run(command);
+	}
+
+	for (const auto& expected : writeParams) {
+		EXPECT_EQ(false, ContainsStringInFile(SSD_NAND_FILENAME, expected));
+	}
+
+	string writeCommandOneMore = "W 6 0x0F020304"; //내부적으로 flush 발생 해야함
+	ssdController.Run(writeCommandOneMore);
+
+	for (const auto& expected : writeParams) {
+		EXPECT_EQ(true, ContainsStringInFile(SSD_NAND_FILENAME, expected));
 	}
 }

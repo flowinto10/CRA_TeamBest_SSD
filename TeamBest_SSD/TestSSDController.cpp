@@ -1,4 +1,5 @@
 ﻿#include "gmock/gmock.h"
+#include "TestCommons.h"
 #include "ssd_controller.h"
 #include "ssd.h"
 #include "command_buffer.h"
@@ -77,41 +78,46 @@ TEST(TestSSDController, ValidReadCommand) {
 }
 
 TEST(TestSSDController, ValidWriteCommand) {
+	const std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
 	SSDController ssdController{ mockSSD };
 
-	vector<string> commands = {
-		"W 1 0xFFFFFFFF",
-		"w 1 0xFFFFFFFF"
-	};
+	vector<pair<string, string>> commandsAndExpected = {
+		{"W 1 0x1234ABCD", "1_W 1 0x1234ABCD"},
+		{"w 2 0xABCD1234", "2_W 2 0xABCD1234"}
+	};	
 
-	for (const auto& command : commands) {
-		EXPECT_CALL(*mockSSD, Write(1, "0xFFFFFFFF")).Times(1);
-
+	for (const auto& [command, expectdBufferName]: commandsAndExpected) {
 		bool result = ssdController.Run(command);
-		EXPECT_EQ(true, result);
+
+		std::vector<std::string> files = GetFilesInDirectory(BUFFER_DIR);
+		bool addCommandCheck = (std::find(files.begin(), files.end(), 
+			expectdBufferName) != files.end());
+		EXPECT_EQ(true, addCommandCheck);
 	}
-
-	string command = { "w 1 0xffffffff" };
-	EXPECT_CALL(*mockSSD, Write(1, "0xffffffff")).Times(1);
-
-	bool result = ssdController.Run(command);
-	EXPECT_EQ(true, result);
 }
 
 TEST(TestSSDController, ValidEraseCommand) {
+	const std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
 	SSDController ssdController{ mockSSD };
 
-	vector<string> commands = {
-		"E 1 5",
-		"e 1 5"
+	vector<pair<string, string>> commandsAndExpected = {
+		{"E 1 5", "1_E 1 5"},
+		{"e 11 7", "2_E 11 7"}
 	};
 
-	EXPECT_CALL(*mockSSD, Erase(1, 5)).Times(commands.size());
-	for (const auto& command : commands) {
+	for (const auto& [command, expectdBufferName] : commandsAndExpected) {
 		bool result = ssdController.Run(command);
-		EXPECT_EQ(true, result);
+
+		std::vector<std::string> files = GetFilesInDirectory(BUFFER_DIR);
+		bool addCommandCheck = (std::find(files.begin(), files.end(),
+			expectdBufferName) != files.end());
+		EXPECT_EQ(true, addCommandCheck);
 	}
 }
 
@@ -138,11 +144,13 @@ TEST(TestSSDController, ValidFlushCommand) {
 	}
 
 	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();	
-	
 	SSDController ssdController{ mockSSD };
 	string command = {"F"};
 
-	EXPECT_CALL(*mockSSD, Write(_, _)).Times(2);
-	EXPECT_CALL(*mockSSD, Erase(_, _)).Times(3);
-	ssdController.Run(command);
+	std::vector<std::string> files = GetFilesInDirectory(BUFFER_DIR);
+	for (const auto& expectdBufferName : bufferNames) {		
+		bool addCommandCheck = (std::find(files.begin(), files.end(),
+			expectdBufferName) != files.end());
+		EXPECT_EQ(true, addCommandCheck);
+	}
 }
