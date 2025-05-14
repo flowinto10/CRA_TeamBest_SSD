@@ -144,11 +144,7 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 			||	cmd == "E" && CanBeRemovedWhenErase(lba, arg1, bufCmd, bufLba, bufArg1)) {
 			it = RemoveFromBack(buffer, it);
 		}
-		else if (cmd == "E" && 
-			bufCmd == "E" &&
-			lba >= bufLba && lba + std::stoi(arg1) - 1 <= bufLba + std::stoi(bufArg1)-1){
-			return buffer;
-		}
+		else if (cmd == "E" && ContainsRange(lba, arg1, bufCmd, bufLba, bufArg1)) return buffer;
 		else ++it;
 	}
 	buffer.push_back(command);
