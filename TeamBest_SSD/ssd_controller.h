@@ -30,15 +30,22 @@ public:
 
 private:
 	bool IsValidCommand(const std::vector<std::string>& commandTokens);
-	void Execute(const std::vector<std::string>& commandTokens);	
+	void Execute(
+		const std::vector<std::string>& commandTokens,
+		const std::string & originCommand);	
 	void SetExecutor(std::shared_ptr<ISSD> ssdExecutor);
 	void ConvertCommandToUpperCase(std::string & command);
+	void ConvertFirstLetterToUpperCase(std::string& command);
 	bool IsSupportedCommandName(const std::string& command);
 
 	void ExcuteReadCommand(const std::vector<std::string>& commandTokens);
-	void ExcuteWriteCommand(const std::vector<std::string>& commandTokens);
-	void ExcuteEraseCommand(const std::vector<std::string>& commandTokens);
-	void ExcuteFlushCommand(const std::vector<std::string>& commandTokens);
+	void ExcuteWriteCommand(
+		const std::vector<std::string>& commandTokens,
+		const std::string& originCommand);
+	void ExcuteEraseCommand(
+		const std::vector<std::string>& commandTokens,
+		const std::string& originCommand);
+	void ExcuteFlushCommand();
 
 private:
 	std::shared_ptr<ISSD> ssd;
@@ -64,6 +71,10 @@ inline void SSDController::SetExecutor(std::shared_ptr<ISSD> ssdExecutor) {
 
 inline void SSDController::ConvertCommandToUpperCase(std::string& command) {
 	command = BEST_UTILS::ToUpper(command);
+}
+
+inline void SSDController::ConvertFirstLetterToUpperCase(std::string& command){
+	if(!command.empty()) BEST_UTILS::ToUpper(command[0]);
 }
 
 inline bool SSDController::IsSupportedCommandName(const std::string& command) {

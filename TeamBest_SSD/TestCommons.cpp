@@ -1,4 +1,4 @@
-#include "TestCommons.h"
+ï»¿#include "TestCommons.h"
 
 #include <iostream>
 #include <filesystem>
@@ -13,7 +13,7 @@ void ClearFileContent(const std::string& path) {
 	std::ofstream file(path, std::ios::trunc);
 
 	if (!file.is_open()) {
-		throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + path);
+		throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + path);
 	}
 	file.close();
 }
@@ -28,7 +28,7 @@ void RemoveFile(const std::string& path) {
 std::string ReadFileContent(const std::string& path) {
 	std::ifstream file(path);
 	if (!file.is_open()) {
-		throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + path);
+		throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + path);
 	}
 
 	std::string line;
@@ -41,7 +41,7 @@ std::string ReadFileContent(const std::string& path) {
 bool ContainsStringInFile(const std::string& filePath, const std::string& keyword) {
 	std::ifstream file(filePath);
 	if (!file.is_open()) {
-		throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + filePath);
+		throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + filePath);
 	}
 
 	std::string line;
@@ -78,7 +78,7 @@ std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 	}
 	catch (const fs::filesystem_error& e) {
 #ifdef _DEBUG
-		std::cerr << "ÆÄÀÏ ¸ñ·Ï °Ë»ç Áß ¿À·ù ¹ß»ı: " << e.what() << '\n';
+		std::cerr << "íŒŒì¼ ëª©ë¡ ê²€ì‚¬ ì¤‘ ì˜¤ë¥˜ ë°œìƒ: " << e.what() << '\n';
 #endif
 	}
 

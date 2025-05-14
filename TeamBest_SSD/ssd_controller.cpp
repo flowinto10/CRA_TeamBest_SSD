@@ -8,12 +8,14 @@ SSDController::SSDController(std::shared_ptr<ISSD> ssdExecutor)
 }
 
 
-bool SSDController::Run(const std::string& command) {
+bool SSDController::Run(const std::string& orgCommand) {
+    std::string command = orgCommand;
+    ConvertFirstLetterToUpperCase(command);
 	std::vector<std::string> tokens = BEST_UTILS::StringTokenizer(command);
-    ConvertCommandToUpperCase(tokens[SSD_COMMAND_PARAM_INDEX::COMMAND]);
+    
     if (!IsValidCommand(tokens)) return false;
 
-    Execute(tokens);
+    Execute(tokens, command);
     return true;
 }
 
@@ -32,7 +34,9 @@ bool SSDController::IsValidCommand(const std::vector<std::string>& commandTokens
     return true;
 }
 
-void SSDController::Execute(const std::vector<std::string>& commandTokens) {
+void SSDController::Execute(
+    const std::vector<std::string>& commandTokens,
+    const std::string& originCommand) {
     const std::string& commandName 
         = commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND];
 
@@ -40,13 +44,13 @@ void SSDController::Execute(const std::vector<std::string>& commandTokens) {
         ExcuteReadCommand(commandTokens);        
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::WRITE]) {
-        ExcuteWriteCommand(commandTokens);
+        ExcuteWriteCommand(commandTokens, originCommand);
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::ERASE]) {
-        ExcuteEraseCommand(commandTokens);
+        ExcuteEraseCommand(commandTokens, originCommand);
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::FLUSH]) {
-        ExcuteFlushCommand(commandTokens);
+        ExcuteFlushCommand();
     }
 }
 
@@ -61,21 +65,40 @@ void SSDController::ExcuteReadCommand(const std::vector<std::string>& commandTok
     }
 }
 
-void SSDController::ExcuteWriteCommand(const std::vector<std::string>& commandTokens) {
-    ssd->Write(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
-        commandTokens[SSD_COMMAND_PARAM_INDEX::VALUE]);
+void SSDController::ExcuteWriteCommand(
+    const std::vector<std::string>& commandTokens,
+    const std::string& originCommand) {
+    if (cmdBuffers->IsFull()) {
+        ExcuteFlushCommand();
+    }
+    cmdBuffers->AppendCommand(originCommand);
 }
-void SSDController::ExcuteEraseCommand(const std::vector<std::string>& commandTokens) {
-    ssd->Erase(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
-        std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE]));
+
+void SSDController::ExcuteEraseCommand(
+    const std::vector<std::string>& commandTokens,
+    const std::string& originCommand) {
+    if (cmdBuffers->IsFull()) {
+        ExcuteFlushCommand();
+    }
+    cmdBuffers->AppendCommand(originCommand);
 }
-void SSDController::ExcuteFlushCommand(const std::vector<std::string>& commandTokens) {
+
+void SSDController::ExcuteFlushCommand() {
     std::vector<std::string> commandInBuffers = cmdBuffers->Flush();
     for (const auto& command : commandInBuffers) {
-#ifdef _DEBUG
-        std::cout << "Command In Buffers : " << command << std::endl;
-#endif
-        Run(command);
+
+        std::vector<std::string> commandTokens = BEST_UTILS::StringTokenizer(command);
+        const std::string& commandName
+            = commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND];
+
+       if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::WRITE]) {
+           ssd->Write(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
+               commandTokens[SSD_COMMAND_PARAM_INDEX::VALUE]);
+        }
+        else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::ERASE]) {
+           ssd->Erase(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
+               std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE]));
+        }
     }
 }
 

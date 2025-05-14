@@ -109,10 +109,6 @@ void CommandBuffer::AppendCommand(const std::string& command) {
 	if (IsFull()) return;
 	std::string emptyBuffer = GetFirstEmptyBuffer();
 
-#ifdef _DEBUG
-	std::cout << "Empty Buffer : " << emptyBuffer << std::endl;
-#endif
-
 	WriteCommandToBuffer(emptyBuffer, command);
 }
 
