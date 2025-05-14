@@ -26,6 +26,10 @@ public:
 	void Erase(int lba, int size) override;
 	void WriteValueToOutputFile(const std::string& value) override;
 
+	bool IsValidAddress(int address);
+	bool IsValidValue(const std::string& value);
+	bool IsValidSIze(int lba, int size);
+
 	void SetAddressRange(int addressMin, int addressMax);
 	std::pair<int, int> GetAddressRange( );
 
@@ -34,9 +38,6 @@ private:
 
 	bool IsNandFileExist();
 	bool IsOutputFileExist();
-	bool IsValidAddress(int address);
-	bool IsValidValue(const std::string& value);	
-	bool IsValidSIze(int lba, int size);
 	
 	void UpdateValueAtAddress(int lba, const std::string& value);
 	std::vector<std::string> ReadDataForEntireAddress();
@@ -59,7 +60,7 @@ private:
 	inline static const std::string NAND_FILE_PATH{"ssd_nand.txt"};
 	inline static const std::string OUTPUT_FILE_PATH{ "ssd_output.txt" };
 
-	const std::regex VALID_DATA_PATTERN{ "^0x[0-9A-Fa-f]{8}$" };;
+	inline static const std::regex VALID_DATA_PATTERN{ "^0x[0-9A-F]{8}$" };
 	inline static const std::string ERROR_MESSAGE{ "ERROR" };
 
 };

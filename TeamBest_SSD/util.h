@@ -6,6 +6,16 @@
 #include <vector>
 
 namespace BEST_UTILS {
+    inline std::string Trim(const std::string& str) {
+        auto begin = std::find_if_not(str.begin(), str.end(), ::isspace);
+        auto end = std::find_if_not(str.rbegin(), str.rend(), ::isspace).base();
+
+        if (begin >= end)
+            return "";
+
+        return std::string(begin, end);
+    }
+
     inline void ToUpper(char & input) {
         input = std::toupper(input);
     }
@@ -41,10 +51,21 @@ namespace BEST_UTILS {
         return tokens;
     }
 
+
     inline std::pair<int, int> getMinMax(std::vector<int> vec) {
         std::sort(vec.begin(), vec.end());
         int min = vec[0];
         int max = vec[3];
         return { min, max };
+    }
+
+    inline bool IsNumericOnly(const std::string& str) {
+        if (str.empty()) return false;
+        for (char ch : str) {
+            if (!std::isdigit(static_cast<unsigned char>(ch))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
