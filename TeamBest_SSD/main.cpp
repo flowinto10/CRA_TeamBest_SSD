@@ -6,6 +6,7 @@ using namespace testing;
 #else
 #include "ssd_controller.h"
 #include "ssd_factory.h"
+#include "util.h"
 #endif
 
 
@@ -26,7 +27,7 @@ int main(int argc, char* argv[])
     for (int i = 1; i < argc; ++i)
         commandLine = commandLine + " " + std::string{ argv[i] };
 
-    ssdController.Run(commandLine);
+    ssdController.Run(BEST_UTILS::Trim(commandLine));
 
     return 0;
 #endif

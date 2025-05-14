@@ -7,9 +7,13 @@
 buffer
 buffer*
 buffer/*
+*/buffer/*
 ssd_nand.txt
 ssd_output.txt
-
+*/ssd_nand.txt
+*/ssd_output.txt
+*/*/ssd_nand.txt
+*/*/ssd_output.txt
 # User-specific files
 *.rsuser
 *.suo

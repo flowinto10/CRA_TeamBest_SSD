@@ -6,6 +6,16 @@
 #include <vector>
 
 namespace BEST_UTILS {
+    inline std::string Trim(const std::string& str) {
+        auto begin = std::find_if_not(str.begin(), str.end(), ::isspace);
+        auto end = std::find_if_not(str.rbegin(), str.rend(), ::isspace).base();
+
+        if (begin >= end)
+            return "";
+
+        return std::string(begin, end);
+    }
+
     inline void ToUpper(char & input) {
         input = std::toupper(input);
     }
