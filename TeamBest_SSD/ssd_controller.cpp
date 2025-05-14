@@ -12,7 +12,8 @@ bool SSDController::Run(const std::string& orgCommand) {
     std::string command = orgCommand;
     ConvertFirstLetterToUpperCase(command);
 	std::vector<std::string> tokens = BEST_UTILS::StringTokenizer(command);
-    
+    if (tokens.empty()) return false;
+
     if (!IsValidCommand(tokens)) return false;
 
     Execute(tokens, command);
