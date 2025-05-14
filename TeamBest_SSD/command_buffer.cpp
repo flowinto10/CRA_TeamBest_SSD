@@ -135,14 +135,10 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 	std::string cmd= values[0], lba= values[1], arg1= values[2];
 	if (cmd == "W") {
 		std::string value = arg1;
-		// 뒤에서부터 순회하면서 조건에 맞는 요소를 pop
 		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
 			std::vector<std::string> values = SplitValuesFromCommand(*it);
 			std::string bufCmd = values[0], bufLba = values[1], bufArg1 = values[2];
-			if (IsWriteAtSameLBA(lba, bufCmd, bufLba)) {
-				it = RemoveFromBack(buffer, it);
-			}
-			else if (bufCmd == "E" && bufLba == lba && bufArg1 == "1") {
+			if (CanBeRemovedWhenWrite(lba, bufCmd, bufLba, bufArg1)) {
 				it = RemoveFromBack(buffer, it);
 			}
 			else ++it;
