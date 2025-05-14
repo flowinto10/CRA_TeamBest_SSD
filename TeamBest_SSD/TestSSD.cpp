@@ -1,4 +1,5 @@
 ﻿#include "gmock/gmock.h"
+#include "TestCommons.h"
 #include "ssd.h"
 
 #include <memory>
@@ -9,45 +10,6 @@
 #include <utility>
 
 using namespace testing;
-
-
-void ClearFileContent(const std::string& path) {
-    std::ofstream file(path, std::ios::trunc);
-
-    if (!file.is_open()) {
-        throw std::runtime_error("파일을 열 수 없습니다: " + path);
-    }
-    file.close();
-}
-
-std::string ReadFileContent(const std::string& path) {
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        throw std::runtime_error("파일을 열 수 없습니다: " + path);
-    }
-
-    std::string line;
-    std::getline(file, line);
-    file.close();
-
-    return line;
-}
-
-bool ContainsStringInFile(const std::string& filePath, const std::string& keyword) {
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        throw std::runtime_error("파일을 열 수 없습니다: " + filePath);
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.find(keyword) != std::string::npos) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 TEST(TestSSD, ContructorTest) {
 	EXPECT_NO_THROW(std::shared_ptr<SSD> ssd = std::make_shared<SSD>());

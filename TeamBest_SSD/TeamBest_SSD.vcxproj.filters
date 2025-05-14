@@ -18,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TeamBest_SSD.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ssd.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -39,6 +36,27 @@
     <ClCompile Include="ssd_controller.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="command_buffer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ssd_factory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSSDFactory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCommandBuffer.cpp">
+      <Filter>TEST</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCommons.cpp">
+      <Filter>TEST</Filter>
+    </ClCompile>
+    <ClCompile Include="TestTntegration.cpp">
+      <Filter>TEST</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -49,6 +67,18 @@
     </ClInclude>
     <ClInclude Include="ssd_controller.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="command_buffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ssd_factory.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestCommons.h">
+      <Filter>TEST</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

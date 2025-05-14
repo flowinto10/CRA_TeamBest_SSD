@@ -1,4 +1,5 @@
 ﻿#include "gmock/gmock.h"
+#include "TestCommons.h"
 #include "command_buffer.h"
 #include <iostream>
 #include <filesystem>
@@ -11,63 +12,10 @@
 using namespace testing;
 namespace fs = std::filesystem;
 
-
-int countFilesInBuffer() {
-	int count = 0;
-	for (const auto& entry : std::filesystem::directory_iterator("buffer")) {
-		if (std::filesystem::is_regular_file(entry)) {
-			++count;
-		}
-	}
-	return count;
-}
-
-std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
-	std::vector<std::string> fileList;
-
-	try {
-		if (fs::exists(directoryPath) && fs::is_directory(directoryPath)) {
-			for (const auto& entry : fs::directory_iterator(directoryPath)) {
-				if (fs::is_regular_file(entry.status())) {
-					fileList.push_back(entry.path().filename().string());
-				}
-			}
-		}
-	}
-	catch (const fs::filesystem_error& e) {
-#ifdef _DEBUG
-		std::cerr << "파일 목록 검사 중 오류 발생: " << e.what() << '\n';
-#endif
-	}
-
-	return fileList;
-
-}
-
-void RemoveDirectoryAndRecreate( const std::string& dirPath ) {
-	if (std::filesystem::exists(dirPath))
-		std::filesystem::remove_all(dirPath);
-
-	if (!fs::exists(dirPath)) {
-		fs::create_directory(dirPath);
-	}
-}
-
-void MakeBufferFiles(
-	const std::vector<std::string>& bufferNames, 
-	const std::string & bufferDirPath) {
-	for (const auto& bufferName : bufferNames) {
-		std::ofstream outFile(bufferDirPath + "/" + bufferName);
-		outFile.close();
-	}
-}
-
-
 TEST(TestCommandBuffer, ContructorTest) {
 	EXPECT_NO_THROW(std::shared_ptr<CommandBuffer> buffer 
 		= std::make_shared<CommandBuffer>());
 }
-
 
 TEST(TestCommandBuffer, BufferExistsAfterInit){
 	const std::string dirName = "buffer";
@@ -289,4 +237,40 @@ TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable) {
 
 	std::string expected{ "0x12345678" };
 	EXPECT_EQ(expected, value);
+}
+
+TEST(TestCommandBuffer, TestFlushWhenBufferEmpty) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	CommandBuffer buffers;	
+	std::vector<std::string> commandBuffers = buffers.Flush();
+
+	std::vector<std::string> expected{};
+	EXPECT_EQ(expected, commandBuffers);
+}
+
+TEST(TestCommandBuffer, TestFlushWhenBufferNotEmpty) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	std::vector<std::string> commandBuffers = buffers.Flush();
+
+	std::vector<std::string> expected{
+		{"E 3 4"},
+		{"W 72 0x12345678" }
+	};
+	EXPECT_EQ(expected, commandBuffers);
 }

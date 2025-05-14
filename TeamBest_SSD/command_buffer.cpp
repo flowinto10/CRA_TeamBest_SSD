@@ -17,7 +17,11 @@ bool CommandBuffer::IsFull() {
 }
 
 std::vector<std::string> CommandBuffer::Flush() {
-	return {};
+	std::vector<std::string> commandBuffers = ReadBuffers();
+	RemoveBufferDirectory();
+	InitBuffers();
+
+	return commandBuffers;
 }
 
 std::string CommandBuffer::FastRead(int targetAddress) {
