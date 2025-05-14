@@ -347,7 +347,7 @@ TEST(TestCommandBuffer, TestIgnorehenWriteAtLBAIncluded) {
 	EXPECT_EQ(cmds, expectedCmds);
 }
 
-TEST(TestCommandBuffer, TestIgnorehenEraseFromIncludedRange) {
+TEST(TestCommandBuffer, TestIgnoreWhenEraseFromIncludedRange) {
 	std::string BUFFER_DIR = "buffer";
 	RemoveDirectoryAndRecreate(BUFFER_DIR);
 	std::vector<std::string> bufferNames = {
@@ -367,6 +367,53 @@ TEST(TestCommandBuffer, TestIgnorehenEraseFromIncludedRange) {
 		"E 3 4",
 		"W 0 0x12345678",
 		"E 72 5"
+	};
+	EXPECT_EQ(cmds, expectedCmds);
+}
+
+TEST(TestCommandBuffer, TestEraseCommandIsIgnoredWhenRangeIsIncluded) {
+	std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_E 71 6" },
+		{"3_W 0 0x12345678"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffer;
+	const std::string& command = "E 72 5";
+	std::vector<std::string> cmds = buffer.ApplyIgnoreStrategy(command);
+
+	std::vector<std::string> expectedCmds = {
+		"E 3 4",
+		"E 71 6",
+		"W 0 0x12345678"		
+	};
+	EXPECT_EQ(cmds, expectedCmds);
+}
+
+TEST(TestCommandBuffer, TestEraseCommandIsIgnoredWhenRangeIsIncluded2) {
+	std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_E 71 6" },
+		{"3_W 73 0x12345678"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffer;
+	const std::string& command = "E 72 5";
+	std::vector<std::string> cmds = buffer.ApplyIgnoreStrategy(command);
+
+	std::vector<std::string> expectedCmds = {
+		"E 3 4",
+		"E 71 6"
 	};
 	EXPECT_EQ(cmds, expectedCmds);
 }
