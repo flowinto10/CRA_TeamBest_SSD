@@ -63,6 +63,8 @@ private:
 	bool CanBeRemovedWhenWrite(int lba, std::string bufCmd, int bufLba, std::string bufArg1);
 	
 	bool IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool IsEraseFromIncludedRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool CanBeRemovedWhenErase(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
 
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
@@ -123,6 +125,15 @@ inline bool CommandBuffer::CanBeRemovedWhenWrite(int lba, std::string bufCmd, in
 
 inline bool CommandBuffer::IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
 	return bufCmd == "W" && bufLba >= lba && bufLba <= lba + std::stoi(arg1) - 1;
+}
+
+inline bool CommandBuffer::IsEraseFromIncludedRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufLba >= lba && bufLba + std::stoi(bufArg1) - 1 <= lba + std::stoi(arg1) - 1;
+}
+
+inline bool CommandBuffer::CanBeRemovedWhenErase(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return IsWriteAtLBAIncluded(lba, arg1, bufCmd, bufLba, bufArg1)
+		|| IsEraseFromIncludedRange(lba, arg1, bufCmd, bufLba, bufArg1);
 }
 
 inline std::vector<std::string>::reverse_iterator CommandBuffer::RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it) {
