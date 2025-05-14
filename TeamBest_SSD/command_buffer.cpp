@@ -142,6 +142,9 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 			if (IsWriteAtSameLBA(lba, bufCmd, bufLba)) {
 				it = RemoveFromBack(buffer, it);
 			}
+			else if (bufCmd == "E" && bufLba == lba && bufArg1 == "1") {
+				it = RemoveFromBack(buffer, it);
+			}
 			else ++it;
 		}
 		buffer.push_back(command);
