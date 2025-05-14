@@ -37,25 +37,45 @@ void SSDController::Execute(const std::vector<std::string>& commandTokens) {
         = commandTokens[SSD_COMMAND_PARAM_INDEX::COMMAND];
 
     if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::READ]) {
-        ssd->Read(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]));
+        ExcuteReadCommand(commandTokens);        
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::WRITE]) {
-        ssd->Write(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
-                   commandTokens[SSD_COMMAND_PARAM_INDEX::VALUE]);
+        ExcuteWriteCommand(commandTokens);
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::ERASE]) {
-        ssd->Erase(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
-            std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE]));
+        ExcuteEraseCommand(commandTokens);
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::FLUSH]) {
-        std::vector<std::string> commandInBuffers = cmdBuffers->Flush();
-        for (const auto& command : commandInBuffers) {
-#ifdef _DEBUG
-            std::cout << "Command In Buffers : " << command << std::endl;
-#endif
-            Run(command);
-        }
+        ExcuteFlushCommand(commandTokens);
     }
 }
 
+void SSDController::ExcuteReadCommand(const std::vector<std::string>& commandTokens) {
+    int targetAddress = std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]);
+    std::string fastReadResult = cmdBuffers->FastRead(targetAddress);
+    if (fastReadResult.empty()) {
+        ssd->Read(targetAddress);
+    }
+    else {
+        ssd->WriteValueToOutputFile(fastReadResult);
+    }
+}
+
+void SSDController::ExcuteWriteCommand(const std::vector<std::string>& commandTokens) {
+    ssd->Write(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
+        commandTokens[SSD_COMMAND_PARAM_INDEX::VALUE]);
+}
+void SSDController::ExcuteEraseCommand(const std::vector<std::string>& commandTokens) {
+    ssd->Erase(std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]),
+        std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE]));
+}
+void SSDController::ExcuteFlushCommand(const std::vector<std::string>& commandTokens) {
+    std::vector<std::string> commandInBuffers = cmdBuffers->Flush();
+    for (const auto& command : commandInBuffers) {
+#ifdef _DEBUG
+        std::cout << "Command In Buffers : " << command << std::endl;
+#endif
+        Run(command);
+    }
+}
 

@@ -35,6 +35,11 @@ private:
 	void ConvertCommandToUpperCase(std::string & command);
 	bool IsSupportedCommandName(const std::string& command);
 
+	void ExcuteReadCommand(const std::vector<std::string>& commandTokens);
+	void ExcuteWriteCommand(const std::vector<std::string>& commandTokens);
+	void ExcuteEraseCommand(const std::vector<std::string>& commandTokens);
+	void ExcuteFlushCommand(const std::vector<std::string>& commandTokens);
+
 private:
 	std::shared_ptr<ISSD> ssd;
 	std::shared_ptr<CommandBuffer> cmdBuffers;
