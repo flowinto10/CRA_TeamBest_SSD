@@ -145,6 +145,20 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 		}
 		buffer.push_back(command);
 	}
+	else if (cmd == "E") {
+		int lba2 = std::stoi(lba);
+		int size = std::stoi(arg1);
+		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
+			std::vector<std::string> values = SplitValuesFromCommand(*it);
+			std::string bufCmd = values[0], bufArg1 = values[2];
+			int bufLba = std::stoi(values[1]);
+			if (bufCmd == "W" && bufLba >= lba2 && bufLba <= lba2 + size - 1) {
+				it = RemoveFromBack(buffer, it);
+			}
+			else ++it;
+		}
+		buffer.push_back(command);
+	}
 	return buffer;
 }
 

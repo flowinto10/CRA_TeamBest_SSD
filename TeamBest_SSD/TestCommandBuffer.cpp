@@ -322,3 +322,27 @@ TEST(TestCommandBuffer, TesIgnoreWhenEraseAtSameLBAAndSize1) {
 	};
 	EXPECT_EQ(cmds, expectedCmds);
 }
+
+TEST(TestCommandBuffer, TestIgnorehenWriteToLBAIncluded) {
+	std::string BUFFER_DIR = "buffer";
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 74 0xAAAAAAAA" },
+		{"3_W 0 0x12345678"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffer;
+	const std::string& command = "E 72 5";
+	std::vector<std::string> cmds = buffer.ApplyIgnoreStrategy(command);
+
+	std::vector<std::string> expectedCmds = {
+		"E 3 4",
+		"W 0 0x12345678",
+		"E 72 5"
+	};
+	EXPECT_EQ(cmds, expectedCmds);
+}
