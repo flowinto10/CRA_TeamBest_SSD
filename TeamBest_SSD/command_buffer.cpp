@@ -107,9 +107,13 @@ std::vector<std::string> CommandBuffer::ReadBuffers() {
 
 void CommandBuffer::AppendCommand(const std::string& command) {
 	if (IsFull()) return;
-	std::string emptyBuffer = GetFirstEmptyBuffer();
 
-	WriteCommandToBuffer(emptyBuffer, command);
+	std::vector<std::string> buffer = ApplyIgnoreStrategy(command);
+	ClearBuffer();
+	for (auto cmd : buffer) {
+		std::string emptyBuffer = GetFirstEmptyBuffer();
+		WriteCommandToBuffer(emptyBuffer, cmd);
+	}
 }
 
 std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string& command) {
@@ -200,4 +204,10 @@ void CommandBuffer::WriteCommandToBuffer(
 		std::cerr << "Buffer 이름 변경 실패: " << e.what() << '\n';
 #endif
 	}
+}
+
+void CommandBuffer::ClearBuffer() {
+	if (std::filesystem::exists(BUFFER_DIR_PATH))
+		std::filesystem::remove_all(BUFFER_DIR_PATH);
+	InitBuffers();
 }

@@ -33,11 +33,11 @@ public:
 	std::string FastRead(int address);
 	void AppendCommand(const std::string& command);
 	std::vector<std::string> ReadBuffers();
-	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
+	
 
 private:
 	void InitBuffers();
-	
+	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
 	void ApplyMergeStrategy();
 
 	bool IsEmptyBuffer(const std::string& bufferName);
@@ -70,6 +70,7 @@ private:
 
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
+	void ClearBuffer();
 
 private:
 	std::vector<std::string> buffers;
