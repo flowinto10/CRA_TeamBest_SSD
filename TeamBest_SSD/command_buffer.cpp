@@ -116,25 +116,33 @@ void CommandBuffer::AppendCommand(const std::string& command) {
 	WriteCommandToBuffer(emptyBuffer, command);
 }
 
-std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& command) {
-	std::vector<std::string> buffer = ReadBuffers();
-	
+std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string& command) {
+	// E와 W만 가능
 	std::istringstream iss(command);
 	std::string cmd, lba, arg1;
-	iss >> cmd >> lba >> arg1;   // 각 단어를 변수에 저장
+	if (!(iss >> cmd >> lba >> arg1))
+		throw std::invalid_argument("Command format is incorrect or missing parameters.");
+	std::vector<std::string> values;
+	values.push_back(cmd);
+	values.push_back(lba);
+	values.push_back(arg1);
+	return values;
+}
+
+std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& command) {
+	std::vector<std::string> buffer = ReadBuffers();
+	std::vector<std::string> values = SplitValuesFromCommand(command);
+	std::string cmd= values[0], lba= values[1], arg1= values[2];
 	if (cmd == "W") {
 		std::string value = arg1;
 		// 뒤에서부터 순회하면서 조건에 맞는 요소를 pop
 		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
-			std::istringstream issBuf(*it);
-			std::string bufCmd, bufLba, bufArg1;
-			issBuf >> bufCmd >> bufLba >> bufArg1;
-			if (bufCmd == "W" && bufLba == lba) {
-				it = decltype(it)(buffer.erase((it + 1).base())); // erase는 iterator를 반환하므로, 이를 조정
+			std::vector<std::string> values = SplitValuesFromCommand(*it);
+			std::string bufCmd = values[0], bufLba = values[1], bufArg1 = values[2];
+			if (IsWriteAtSameLBA(lba, bufCmd, bufLba)) {
+				it = RemoveFromBack(buffer, it);
 			}
-			else {
-				++it;
-			}
+			else ++it;
 		}
 		buffer.push_back(command);
 	}
