@@ -180,9 +180,9 @@ std::pair<int, int> CommandBuffer::getUnifiedLBAAndSize(int lba, std::string arg
 	int range1Start = lba, range1End = lba + std::stoi(arg1) - 1;
 	int range2Start = bufLba, range2end = bufLba + std::stoi(bufArg1) - 1;
 	std::vector<int> vec = { range1Start, range1End, range2Start, range2end };
-	std::sort(vec.begin(), vec.end());
-	int unifiedLBA = vec[0];
-	int unifiedSize = vec[3] - vec[0] + 1;
+	auto [min, max] = BEST_UTILS::getMinMax(vec);
+	int unifiedLBA = min;
+	int unifiedSize = max - min + 1;
 	return { unifiedLBA, unifiedSize };
 }
 

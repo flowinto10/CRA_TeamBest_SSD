@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <algorithm>
@@ -39,5 +39,12 @@ namespace BEST_UTILS {
         }
 
         return tokens;
+    }
+
+    inline std::pair<int, int> getMinMax(std::vector<int> vec) {
+        std::sort(vec.begin(), vec.end());
+        int min = vec[0];
+        int max = vec[3];
+        return { min, max };
     }
 }
