@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <sstream>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -32,11 +33,11 @@ public:
 	std::string FastRead(int address);
 	void AppendCommand(const std::string& command);
 	std::vector<std::string> ReadBuffers();
+	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
 
 private:
 	void InitBuffers();
 	
-	void ApplyIgnoreStrategy();
 	void ApplyMergeStrategy();
 
 	bool IsEmptyBuffer(const std::string& bufferName);

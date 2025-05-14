@@ -116,8 +116,29 @@ void CommandBuffer::AppendCommand(const std::string& command) {
 	WriteCommandToBuffer(emptyBuffer, command);
 }
 
-void CommandBuffer::ApplyIgnoreStrategy() {
-
+std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& command) {
+	std::vector<std::string> buffer = ReadBuffers();
+	
+	std::istringstream iss(command);
+	std::string cmd, lba, arg1;
+	iss >> cmd >> lba >> arg1;   // 각 단어를 변수에 저장
+	if (cmd == "W") {
+		std::string value = arg1;
+		// 뒤에서부터 순회하면서 조건에 맞는 요소를 pop
+		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
+			std::istringstream issBuf(*it);
+			std::string bufCmd, bufLba, bufArg1;
+			issBuf >> bufCmd >> bufLba >> bufArg1;
+			if (bufCmd == "W" && bufLba == lba) {
+				it = decltype(it)(buffer.erase((it + 1).base())); // erase는 iterator를 반환하므로, 이를 조정
+			}
+			else {
+				++it;
+			}
+		}
+		buffer.push_back(command);
+	}
+	return buffer;
 }
 
 void CommandBuffer::ApplyMergeStrategy() {
