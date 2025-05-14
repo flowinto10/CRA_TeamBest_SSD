@@ -32,9 +32,18 @@ bool SSDController::IsValidCommand(const std::vector<std::string>& commandTokens
             && commandParamCount != COMMAND_PRAM_COUNT[i]) return false;
     }
 
+    if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::READ]) {
+        std::string addressStr = commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS];
+        if (!BEST_UTILS::IsNumericOnly(addressStr)) return false;
+    }
+
     if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::WRITE]) {
         std::shared_ptr<SSD> curSSD = std::static_pointer_cast<SSD>(this->ssd);
-        int address = std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]);
+
+        std::string addressStr = commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS];
+        if(!BEST_UTILS::IsNumericOnly(addressStr)) return false;
+            
+        int address = std::stoi(addressStr);
         std::string value = commandTokens[SSD_COMMAND_PARAM_INDEX::VALUE];
 
         if (!curSSD->IsValidAddress(address)) {
@@ -48,8 +57,14 @@ bool SSDController::IsValidCommand(const std::vector<std::string>& commandTokens
     }
     else if (commandName == VALID_COMMAND_LIST[SSD_COMMAND_TYPES::ERASE]) {
         std::shared_ptr<SSD> curSSD = std::static_pointer_cast<SSD>(this->ssd);
-        int address = std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS]);
-        int size = std::stoi(commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE]);
+
+        std::string addressStr = commandTokens[SSD_COMMAND_PARAM_INDEX::ADDRESS];
+        std::string sizeStr = commandTokens[SSD_COMMAND_PARAM_INDEX::SIZE];
+        if (!BEST_UTILS::IsNumericOnly(addressStr)) return false;
+        if (!BEST_UTILS::IsNumericOnly(sizeStr)) return false;
+
+        int address = std::stoi(addressStr);
+        int size = std::stoi(sizeStr);
 
         if (!curSSD->IsValidAddress(address)) {
             curSSD->WriteValueToOutputFile(ERROR_MESSAGE);

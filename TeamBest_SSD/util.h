@@ -51,10 +51,21 @@ namespace BEST_UTILS {
         return tokens;
     }
 
+
     inline std::pair<int, int> getMinMax(std::vector<int> vec) {
         std::sort(vec.begin(), vec.end());
         int min = vec[0];
         int max = vec[3];
         return { min, max };
+    }
+
+    inline bool IsNumericOnly(const std::string& str) {
+        if (str.empty()) return false;
+        for (char ch : str) {
+            if (!std::isdigit(static_cast<unsigned char>(ch))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
