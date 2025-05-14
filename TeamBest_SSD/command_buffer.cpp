@@ -146,6 +146,9 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 		else if (cmd == "E" && IsWriteAtLBAIncluded(lba, arg1, bufCmd, bufLba, bufArg1)) {
 			it = RemoveFromBack(buffer, it);
 		}
+		else if (cmd == "E" && bufCmd == "E" && bufLba >= lba && bufLba + std::stoi(bufArg1) - 1 <= lba + std::stoi(arg1) - 1) {
+			it = RemoveFromBack(buffer, it);
+		}
 		else ++it;
 	}
 	buffer.push_back(command);
