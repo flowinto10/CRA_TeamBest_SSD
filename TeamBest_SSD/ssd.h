@@ -13,6 +13,7 @@ public:
 	virtual void Read(int lba) = 0;
 	virtual void Write(int lba, const std::string& value) = 0;
 	virtual void Erase(int lba, int size) = 0;
+	virtual void WriteValueToOutputFile(const std::string& value) = 0;
 
 };
 
@@ -23,6 +24,7 @@ public:
 	void Read(int lba) override;
 	void Write(int lba, const std::string& value) override;
 	void Erase(int lba, int size) override;
+	void WriteValueToOutputFile(const std::string& value) override;
 
 	void SetAddressRange(int addressMin, int addressMax);
 	std::pair<int, int> GetAddressRange( );
@@ -45,7 +47,6 @@ private:
 
 	std::pair<int, std::string> SplitLineToLbaAndValue(const std::string& line);
 	void ReadValueAtAddress(int lba);
-	void WriteValueToOutputFile(const std::string& value);
 
 private:
 	int addressMin{ ADDRESS_MIN_LIMIT };

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <sstream>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -32,11 +33,11 @@ public:
 	std::string FastRead(int address);
 	void AppendCommand(const std::string& command);
 	std::vector<std::string> ReadBuffers();
+	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
 
 private:
 	void InitBuffers();
 	
-	void ApplyIgnoreStrategy();
 	void ApplyMergeStrategy();
 
 	bool IsEmptyBuffer(const std::string& bufferName);
@@ -55,6 +56,19 @@ private:
 	std::string MakeCommandFromFile(const std::filesystem::directory_entry& file);
 	std::string removeIndex(const std::string& fileName);
 	void RemoveBufferDirectory();
+	std::vector<std::string> SplitValuesFromCommand(const std::string& command);
+
+	bool IsWriteAtSameLBA(int lba, std::string bufCmd, int bufLba);
+	bool IsEraseAtSameLBAAndSize1(int lba, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool CanBeRemovedWhenWrite(int lba, std::string bufCmd, int bufLba, std::string bufArg1);
+	
+	bool IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool IsEraseFromIncludedRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool CanBeRemovedWhenErase(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+
+	bool ContainsRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+
+	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
 
 private:
@@ -96,4 +110,38 @@ inline std::string CommandBuffer::GetBufferIndexAtBufferName(const std::string& 
 
 inline void CommandBuffer::RemoveBufferDirectory() {
 	std::filesystem::remove_all(BUFFER_DIR_PATH);
+}
+
+inline bool CommandBuffer::IsWriteAtSameLBA(int lba, std::string bufCmd, int bufLba) {
+	return bufCmd == "W" && bufLba == lba;
+}
+
+inline bool CommandBuffer::IsEraseAtSameLBAAndSize1(int lba, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufCmd == "E" && bufLba == lba && bufArg1 == "1";
+}
+
+inline bool CommandBuffer::CanBeRemovedWhenWrite(int lba, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return IsWriteAtSameLBA(lba, bufCmd, bufLba)
+		|| IsEraseAtSameLBAAndSize1(lba, bufCmd, bufLba, bufArg1);
+}
+
+inline bool CommandBuffer::IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufCmd == "W" && bufLba >= lba && bufLba <= lba + std::stoi(arg1) - 1;
+}
+
+inline bool CommandBuffer::IsEraseFromIncludedRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufCmd == "E" && bufLba >= lba && bufLba + std::stoi(bufArg1) - 1 <= lba + std::stoi(arg1) - 1;
+}
+
+inline bool CommandBuffer::CanBeRemovedWhenErase(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return IsWriteAtLBAIncluded(lba, arg1, bufCmd, bufLba, bufArg1)
+		|| IsEraseFromIncludedRange(lba, arg1, bufCmd, bufLba, bufArg1);
+}
+
+inline bool CommandBuffer::ContainsRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufCmd == "E" &&	lba >= bufLba && lba + std::stoi(arg1) - 1 <= bufLba + std::stoi(bufArg1) - 1;
+}
+
+inline std::vector<std::string>::reverse_iterator CommandBuffer::RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it) {
+	return decltype(it)(buffer.erase((it + 1).base()));;
 }

@@ -116,8 +116,39 @@ void CommandBuffer::AppendCommand(const std::string& command) {
 	WriteCommandToBuffer(emptyBuffer, command);
 }
 
-void CommandBuffer::ApplyIgnoreStrategy() {
+std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string& command) {
+	// E와 W만 가능
+	std::istringstream iss(command);
+	std::string cmd, lba, arg1;
+	if (!(iss >> cmd >> lba >> arg1))
+		throw std::invalid_argument("Command format is incorrect or missing parameters.");
+	std::vector<std::string> values;
+	values.push_back(cmd);
+	values.push_back(lba);
+	values.push_back(arg1);
+	return values;
+}
 
+std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& command) {
+	std::vector<std::string> buffer = ReadBuffers();
+	std::vector<std::string> values = SplitValuesFromCommand(command);
+	std::string cmd= values[0], arg1= values[2];
+	int lba = std::stoi(values[1]);
+
+	for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
+		std::vector<std::string> values = SplitValuesFromCommand(*it);
+		std::string bufCmd = values[0], bufArg1 = values[2];
+		int bufLba = std::stoi(values[1]);
+
+		if (cmd == "W" && CanBeRemovedWhenWrite(lba, bufCmd, bufLba, bufArg1)
+			||	cmd == "E" && CanBeRemovedWhenErase(lba, arg1, bufCmd, bufLba, bufArg1)) {
+			it = RemoveFromBack(buffer, it);
+		}
+		else if (cmd == "E" && ContainsRange(lba, arg1, bufCmd, bufLba, bufArg1)) return buffer;
+		else ++it;
+	}
+	buffer.push_back(command);
+	return buffer;
 }
 
 void CommandBuffer::ApplyMergeStrategy() {
