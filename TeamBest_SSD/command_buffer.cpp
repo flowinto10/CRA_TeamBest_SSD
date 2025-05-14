@@ -132,33 +132,23 @@ std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string
 std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& command) {
 	std::vector<std::string> buffer = ReadBuffers();
 	std::vector<std::string> values = SplitValuesFromCommand(command);
-	std::string cmd= values[0], lba= values[1], arg1= values[2];
-	if (cmd == "W") {
-		std::string value = arg1;
-		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
-			std::vector<std::string> values = SplitValuesFromCommand(*it);
-			std::string bufCmd = values[0], bufLba = values[1], bufArg1 = values[2];
-			if (CanBeRemovedWhenWrite(lba, bufCmd, bufLba, bufArg1)) {
-				it = RemoveFromBack(buffer, it);
-			}
-			else ++it;
+	std::string cmd= values[0], arg1= values[2];
+	int lba = std::stoi(values[1]);
+
+	for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
+		std::vector<std::string> values = SplitValuesFromCommand(*it);
+		std::string bufCmd = values[0], bufArg1 = values[2];
+		int bufLba = std::stoi(values[1]);
+
+		if (cmd == "W" && CanBeRemovedWhenWrite(lba, bufCmd, bufLba, bufArg1)) {
+			it = RemoveFromBack(buffer, it);
 		}
-		buffer.push_back(command);
-	}
-	else if (cmd == "E") {
-		int lba2 = std::stoi(lba);
-		int size = std::stoi(arg1);
-		for (auto it = buffer.rbegin(); it != buffer.rend(); ) {
-			std::vector<std::string> values = SplitValuesFromCommand(*it);
-			std::string bufCmd = values[0], bufArg1 = values[2];
-			int bufLba = std::stoi(values[1]);
-			if (bufCmd == "W" && bufLba >= lba2 && bufLba <= lba2 + size - 1) {
-				it = RemoveFromBack(buffer, it);
-			}
-			else ++it;
+		else if (cmd == "E" && IsWriteAtLBAIncluded(lba, arg1, bufCmd, bufLba, bufArg1)) {
+			it = RemoveFromBack(buffer, it);
 		}
-		buffer.push_back(command);
+		else ++it;
 	}
+	buffer.push_back(command);
 	return buffer;
 }
 

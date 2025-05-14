@@ -323,7 +323,7 @@ TEST(TestCommandBuffer, TesIgnoreWhenEraseAtSameLBAAndSize1) {
 	EXPECT_EQ(cmds, expectedCmds);
 }
 
-TEST(TestCommandBuffer, TestIgnorehenWriteToLBAIncluded) {
+TEST(TestCommandBuffer, TestIgnorehenWriteAtLBAIncluded) {
 	std::string BUFFER_DIR = "buffer";
 	RemoveDirectoryAndRecreate(BUFFER_DIR);
 	std::vector<std::string> bufferNames = {

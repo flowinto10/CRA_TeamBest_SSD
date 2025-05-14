@@ -57,9 +57,13 @@ private:
 	std::string removeIndex(const std::string& fileName);
 	void RemoveBufferDirectory();
 	std::vector<std::string> SplitValuesFromCommand(const std::string& command);
-	bool IsWriteAtSameLBA(std::string lba, std::string bufCmd, std::string bufLba);
-	bool IsEraseAtSameLBAAndSize1(std::string lba, std::string bufCmd, std::string bufLba, std::string bufArg1);
-	bool CanBeRemovedWhenWrite(std::string lba, std::string bufCmd, std::string bufLba, std::string bufArg1);
+
+	bool IsWriteAtSameLBA(int lba, std::string bufCmd, int bufLba);
+	bool IsEraseAtSameLBAAndSize1(int lba, std::string bufCmd, int bufLba, std::string bufArg1);
+	bool CanBeRemovedWhenWrite(int lba, std::string bufCmd, int bufLba, std::string bufArg1);
+	
+	bool IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
+
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
 
@@ -104,17 +108,21 @@ inline void CommandBuffer::RemoveBufferDirectory() {
 	std::filesystem::remove_all(BUFFER_DIR_PATH);
 }
 
-inline bool CommandBuffer::IsWriteAtSameLBA(std::string lba, std::string bufCmd, std::string bufLba) {
+inline bool CommandBuffer::IsWriteAtSameLBA(int lba, std::string bufCmd, int bufLba) {
 	return bufCmd == "W" && bufLba == lba;
 }
 
-inline bool CommandBuffer::IsEraseAtSameLBAAndSize1(std::string lba, std::string bufCmd, std::string bufLba, std::string bufArg1) {
+inline bool CommandBuffer::IsEraseAtSameLBAAndSize1(int lba, std::string bufCmd, int bufLba, std::string bufArg1) {
 	return bufCmd == "E" && bufLba == lba && bufArg1 == "1";
 }
 
-inline bool CommandBuffer::CanBeRemovedWhenWrite(std::string lba, std::string bufCmd, std::string bufLba, std::string bufArg1) {
+inline bool CommandBuffer::CanBeRemovedWhenWrite(int lba, std::string bufCmd, int bufLba, std::string bufArg1) {
 	return IsWriteAtSameLBA(lba, bufCmd, bufLba)
 		|| IsEraseAtSameLBAAndSize1(lba, bufCmd, bufLba, bufArg1);
+}
+
+inline bool CommandBuffer::IsWriteAtLBAIncluded(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1) {
+	return bufCmd == "W" && bufLba >= lba && bufLba <= lba + std::stoi(arg1) - 1;
 }
 
 inline std::vector<std::string>::reverse_iterator CommandBuffer::RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it) {
