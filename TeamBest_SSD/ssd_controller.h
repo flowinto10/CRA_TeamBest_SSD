@@ -38,7 +38,7 @@ private:
 	void ExcuteReadCommand(const std::vector<std::string>& commandTokens);
 	void ExcuteWriteCommand(const std::vector<std::string>& commandTokens);
 	void ExcuteEraseCommand(const std::vector<std::string>& commandTokens);
-	void ExcuteFlushCommand(const std::vector<std::string>& commandTokens);
+	void ExcuteFlushCommand();
 
 private:
 	std::shared_ptr<ISSD> ssd;
