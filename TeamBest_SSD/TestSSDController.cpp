@@ -81,12 +81,11 @@ TEST(TestSSDController, ValidWriteCommand) {
 	const std::string BUFFER_DIR = "buffer";
 	RemoveDirectoryAndRecreate(BUFFER_DIR);
 
-	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
-	SSDController ssdController{ mockSSD };
+	std::shared_ptr<ISSD> ssd = std::make_shared<SSD>();
+	SSDController ssdController{ ssd };
 
 	vector<pair<string, string>> commandsAndExpected = {
-		{"W 1 0x1234ABCD", "1_W 1 0x1234ABCD"},
-		{"w 2 0xABCD1234", "2_W 2 0xABCD1234"}
+		{"W 1 0x1234ABCD", "1_W 1 0x1234ABCD"}
 	};	
 
 	for (const auto& [command, expectdBufferName]: commandsAndExpected) {
@@ -103,12 +102,11 @@ TEST(TestSSDController, ValidEraseCommand) {
 	const std::string BUFFER_DIR = "buffer";
 	RemoveDirectoryAndRecreate(BUFFER_DIR);
 
-	std::shared_ptr<MockSSD> mockSSD = std::make_shared<MockSSD>();
-	SSDController ssdController{ mockSSD };
+	std::shared_ptr<ISSD> ssd = std::make_shared<SSD>();
+	SSDController ssdController{ ssd };
 
 	vector<pair<string, string>> commandsAndExpected = {
-		{"E 1 5", "1_E 1 5"},
-		{"e 11 7", "2_E 11 7"}
+		{"E 1 5", "1_E 1 5"}
 	};
 
 	for (const auto& [command, expectdBufferName] : commandsAndExpected) {

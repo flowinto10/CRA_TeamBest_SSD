@@ -63,6 +63,7 @@ private:
 		2,
 		0
 	};
+	const std::string ERROR_MESSAGE{ "ERROR" };
 };
 
 inline void SSDController::SetExecutor(std::shared_ptr<ISSD> ssdExecutor) {
