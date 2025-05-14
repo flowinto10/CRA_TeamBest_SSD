@@ -105,18 +105,19 @@ std::vector<std::string> CommandBuffer::ReadBuffers() {
 	return commandList;
 }
 
-void CommandBuffer::AppendCommand(const std::string& command) {
-	if (IsFull()) return;
-
-	std::vector<std::string> buffer = ApplyIgnoreStrategy(command);
-	if (buffer.back() == command && buffer.size() > 1) {
-		buffer = ApplyMergeStrategy(buffer, command);
-	}
-	ClearBuffer();
+void CommandBuffer::WriteAllBufferToFiles(const std::vector<std::string>& buffer) {
 	for (auto cmd : buffer) {
 		std::string emptyBuffer = GetFirstEmptyBuffer();
 		WriteCommandToBuffer(emptyBuffer, cmd);
 	}
+}
+
+void CommandBuffer::AppendCommand(const std::string& command) {
+	if (IsFull()) return;
+	std::vector<std::string> buffer = ApplyIgnoreStrategy(command);
+	if (CanApplyMerge(buffer, command))	buffer = ApplyMergeStrategy(buffer, command);
+	ClearBuffer();
+	WriteAllBufferToFiles(buffer);
 }
 
 std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string& command) {
@@ -166,18 +167,23 @@ std::vector<std::string> CommandBuffer::ApplyMergeStrategy(std::vector<std::stri
 	int bufLba = std::stoi(values[1]);
 	if (bufCmd != "E") return buffer;
 
-	auto [unifiedRangeStart, unifiedRangeEnd] = getMinMax(lba, lba + std::stoi(arg1) - 1, bufLba, bufLba + std::stoi(bufArg1) - 1);
-	if (unifiedRangeEnd - unifiedRangeStart + 1 > 10) return buffer;
+	auto [unifiedLBA, unifiedSize] = getUnifiedLBAAndSize(lba, arg1, bufLba, bufArg1);
+	if (unifiedSize > 10) return buffer;
 	buffer.pop_back();
 	buffer.pop_back();
-	buffer.push_back("E "+ std::to_string(unifiedRangeStart)+" "+ std::to_string(unifiedRangeEnd - unifiedRangeStart + 1));
+	std::string newCommand = MakeCommand("E", unifiedLBA, std::to_string(unifiedSize));
+	buffer.push_back(newCommand);
 	return buffer;
 }
 
-std::pair<int, int> CommandBuffer::getMinMax(int range1Start, int range1End, int range2Start, int range2end) {
+std::pair<int, int> CommandBuffer::getUnifiedLBAAndSize(int lba, std::string arg1, int bufLba, std::string bufArg1) {
+	int range1Start = lba, range1End = lba + std::stoi(arg1) - 1;
+	int range2Start = bufLba, range2end = bufLba + std::stoi(bufArg1) - 1;
 	std::vector<int> vec = { range1Start, range1End, range2Start, range2end };
 	std::sort(vec.begin(), vec.end());
-	return { vec[0], vec[3] };
+	int unifiedLBA = vec[0];
+	int unifiedSize = vec[3] - vec[0] + 1;
+	return { unifiedLBA, unifiedSize };
 }
 
 std::string CommandBuffer::GetBufferContent(std::string bufferName) {

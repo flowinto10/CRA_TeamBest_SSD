@@ -71,7 +71,11 @@ private:
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
 
 	void ClearBuffer();
-	std::pair<int, int> getMinMax(int range1Start, int range1End, int range2Start, int range2end);
+	std::pair<int, int> getUnifiedLBAAndSize(int lba, std::string arg1, int bufLba, std::string bufArg1);
+	inline std::string MakeCommand(std::string cmd, int lba, std::string arg1);
+	bool CanApplyMerge(const std::vector<std::string>& buffer, const std::string& command);
+	void WriteAllBufferToFiles(const std::vector<std::string>& buffer);
+
 
 private:
 	std::vector<std::string> buffers;
@@ -146,4 +150,12 @@ inline bool CommandBuffer::ContainsRange(int lba, std::string arg1, std::string 
 
 inline std::vector<std::string>::reverse_iterator CommandBuffer::RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it) {
 	return decltype(it)(buffer.erase((it + 1).base()));;
+}
+
+inline std::string CommandBuffer::MakeCommand(std::string cmd, int lba, std::string arg1){
+	return cmd + " " + std::to_string(lba) + " " + arg1;
+}
+
+inline bool CommandBuffer::CanApplyMerge(const std::vector<std::string>& buffer, const std::string& command) {
+	return buffer.back() == command && buffer.size() > 1;
 }
