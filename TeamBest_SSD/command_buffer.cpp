@@ -105,11 +105,19 @@ std::vector<std::string> CommandBuffer::ReadBuffers() {
 	return commandList;
 }
 
+void CommandBuffer::WriteAllBufferToFiles(const std::vector<std::string>& buffer) {
+	for (auto cmd : buffer) {
+		std::string emptyBuffer = GetFirstEmptyBuffer();
+		WriteCommandToBuffer(emptyBuffer, cmd);
+	}
+}
+
 void CommandBuffer::AppendCommand(const std::string& command) {
 	if (IsFull()) return;
-	std::string emptyBuffer = GetFirstEmptyBuffer();
-
-	WriteCommandToBuffer(emptyBuffer, command);
+	std::vector<std::string> buffer = ApplyIgnoreStrategy(command);
+	if (CanApplyMerge(buffer, command))	buffer = ApplyMergeStrategy(buffer, command);
+	ClearBuffer();
+	WriteAllBufferToFiles(buffer);
 }
 
 std::vector<std::string> CommandBuffer::SplitValuesFromCommand(const std::string& command) {
@@ -147,8 +155,35 @@ std::vector<std::string> CommandBuffer::ApplyIgnoreStrategy(const std::string& c
 	return buffer;
 }
 
-void CommandBuffer::ApplyMergeStrategy() {
+std::vector<std::string> CommandBuffer::ApplyMergeStrategy(std::vector<std::string>& buffer, const std::string& command) {
+	std::vector<std::string> values = SplitValuesFromCommand(command);
+	std::string cmd = values[0], arg1 = values[2];
+	int lba = std::stoi(values[1]);
+	if (cmd != "E") return buffer;
 
+	auto it = buffer.rbegin() + 1;
+	values = SplitValuesFromCommand(*it);
+	std::string bufCmd = values[0], bufArg1 = values[2];
+	int bufLba = std::stoi(values[1]);
+	if (bufCmd != "E") return buffer;
+
+	auto [unifiedLBA, unifiedSize] = getUnifiedLBAAndSize(lba, arg1, bufLba, bufArg1);
+	if (unifiedSize > 10) return buffer;
+	buffer.pop_back();
+	buffer.pop_back();
+	std::string newCommand = MakeCommand("E", unifiedLBA, std::to_string(unifiedSize));
+	buffer.push_back(newCommand);
+	return buffer;
+}
+
+std::pair<int, int> CommandBuffer::getUnifiedLBAAndSize(int lba, std::string arg1, int bufLba, std::string bufArg1) {
+	int range1Start = lba, range1End = lba + std::stoi(arg1) - 1;
+	int range2Start = bufLba, range2end = bufLba + std::stoi(bufArg1) - 1;
+	std::vector<int> vec = { range1Start, range1End, range2Start, range2end };
+	auto [min, max] = BEST_UTILS::getMinMax(vec);
+	int unifiedLBA = min;
+	int unifiedSize = max - min + 1;
+	return { unifiedLBA, unifiedSize };
 }
 
 std::string CommandBuffer::GetBufferContent(std::string bufferName) {
@@ -200,4 +235,10 @@ void CommandBuffer::WriteCommandToBuffer(
 		std::cerr << "Buffer 이름 변경 실패: " << e.what() << '\n';
 #endif
 	}
+}
+
+void CommandBuffer::ClearBuffer() {
+	if (std::filesystem::exists(BUFFER_DIR_PATH))
+		std::filesystem::remove_all(BUFFER_DIR_PATH);
+	InitBuffers();
 }

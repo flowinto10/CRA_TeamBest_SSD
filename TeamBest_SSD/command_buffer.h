@@ -33,12 +33,12 @@ public:
 	std::string FastRead(int address);
 	void AppendCommand(const std::string& command);
 	std::vector<std::string> ReadBuffers();
-	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
+	
 
 private:
 	void InitBuffers();
-	
-	void ApplyMergeStrategy();
+	std::vector<std::string> ApplyIgnoreStrategy(const std::string& command);
+	std::vector<std::string> ApplyMergeStrategy(std::vector<std::string>& buffer, const std::string& command);
 
 	bool IsEmptyBuffer(const std::string& bufferName);
 	std::string GetBufferContent(std::string bufferName);
@@ -69,6 +69,12 @@ private:
 	bool ContainsRange(int lba, std::string arg1, std::string bufCmd, int bufLba, std::string bufArg1);
 
 	std::vector<std::string>::reverse_iterator RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it);
+
+	void ClearBuffer();
+	std::pair<int, int> getUnifiedLBAAndSize(int lba, std::string arg1, int bufLba, std::string bufArg1);
+	inline std::string MakeCommand(std::string cmd, int lba, std::string arg1);
+	bool CanApplyMerge(const std::vector<std::string>& buffer, const std::string& command);
+	void WriteAllBufferToFiles(const std::vector<std::string>& buffer);
 
 
 private:
@@ -144,4 +150,12 @@ inline bool CommandBuffer::ContainsRange(int lba, std::string arg1, std::string 
 
 inline std::vector<std::string>::reverse_iterator CommandBuffer::RemoveFromBack(std::vector<std::string>& buffer, std::vector<std::string>::reverse_iterator it) {
 	return decltype(it)(buffer.erase((it + 1).base()));;
+}
+
+inline std::string CommandBuffer::MakeCommand(std::string cmd, int lba, std::string arg1){
+	return cmd + " " + std::to_string(lba) + " " + arg1;
+}
+
+inline bool CommandBuffer::CanApplyMerge(const std::vector<std::string>& buffer, const std::string& command) {
+	return buffer.back() == command && buffer.size() > 1;
 }
