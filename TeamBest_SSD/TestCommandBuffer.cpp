@@ -44,6 +44,25 @@ std::vector<std::string> GetFilesInDirectory(const std::string& directoryPath) {
 
 }
 
+void RemoveDirectoryAndRecreate( const std::string& dirPath ) {
+	if (std::filesystem::exists(dirPath))
+		std::filesystem::remove_all(dirPath);
+
+	if (!fs::exists(dirPath)) {
+		fs::create_directory(dirPath);
+	}
+}
+
+void MakeBufferFiles(
+	const std::vector<std::string>& bufferNames, 
+	const std::string & bufferDirPath) {
+	for (const auto& bufferName : bufferNames) {
+		std::ofstream outFile(bufferDirPath + "/" + bufferName);
+		outFile.close();
+	}
+}
+
+
 TEST(TestCommandBuffer, ContructorTest) {
 	EXPECT_NO_THROW(std::shared_ptr<CommandBuffer> buffer 
 		= std::make_shared<CommandBuffer>());
@@ -68,12 +87,8 @@ TEST(TestCommandBuffer, FilesExistAfterInit) {
 TEST(TestCommandBuffer, TestAppendCommand) {
 	std::string BUFFER_DIR = "buffer";
 
-	if (std::filesystem::exists(BUFFER_DIR))
-		std::filesystem::remove_all(BUFFER_DIR);
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
 
-	if (!fs::exists(BUFFER_DIR)) {
-		fs::create_directory(BUFFER_DIR);
-	}
 	std::vector<std::string> bufferNames = {
 		{"1_ABCDEF"},
 		{"4_empty"},
@@ -81,10 +96,8 @@ TEST(TestCommandBuffer, TestAppendCommand) {
 		{"5_empty"},
 		{"2_FEDCBA"}
 	};
-	for (const auto& bufferName : bufferNames) {
-		std::ofstream outFile(BUFFER_DIR + "/" + bufferName);
-		outFile.close();
-	}	
+	
+	MakeBufferFiles(bufferNames, BUFFER_DIR);	
 
 	CommandBuffer buffers;
 	std::string newCommand{"W 1 0xABCDEF89"};
@@ -94,8 +107,8 @@ TEST(TestCommandBuffer, TestAppendCommand) {
 	std::vector<std::string> files = GetFilesInDirectory(BUFFER_DIR);
 	bool addCommandCheck = (std::find(files.begin(), files.end(), newBufferName) != files.end());
 	EXPECT_EQ(true, addCommandCheck);
-
 }
+
 
 TEST(TestCommandBuffer, TestRead5Files) {
 	CommandBuffer buffer;
@@ -233,4 +246,47 @@ TEST(TestCommandBuffer, TestBufferIsFull) {
 	std::vector<std::string> files = buffer.ReadBuffers();
 	bool rst = buffer.IsFull();
 	EXPECT_EQ(true, rst);
+}
+
+TEST(TestCommandBuffer, TestFastReadWhenBufferNotAvailable) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	int targetAddress = 71;
+	std::string value = buffers.FastRead(targetAddress);
+
+	EXPECT_EQ("", value);
+}
+
+TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	int targetAddress = 72;
+	std::string value = buffers.FastRead(targetAddress);
+
+	std::string expected{ "0x12345678" };
+	EXPECT_EQ(expected, value);
 }

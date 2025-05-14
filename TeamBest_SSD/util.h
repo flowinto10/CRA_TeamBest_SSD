@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <cctype>
+#include <vector>
 
 namespace BEST_UTILS {
     inline std::string ToUpper(const std::string& input) {
@@ -10,5 +11,29 @@ namespace BEST_UTILS {
         std::transform(result.begin(), result.end(), result.begin(),
             [](unsigned char c) { return std::toupper(c); });
         return result;
+    }
+
+    inline std::vector<std::string> StringTokenizer(
+        const std::string& inStr, char delimiter = ' ') {
+        std::vector<std::string> tokens;
+        std::string token;
+
+        for (char ch : inStr) {
+            if (ch == delimiter) {
+                if (!token.empty()) {
+                    tokens.push_back(token);
+                    token.clear();
+                }
+            }
+            else {
+                token += ch;
+            }
+        }
+
+        if (!token.empty()) {
+            tokens.push_back(token);
+        }
+
+        return tokens;
     }
 }
