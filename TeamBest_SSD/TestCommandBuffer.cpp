@@ -239,6 +239,73 @@ TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable) {
 	EXPECT_EQ(expected, value);
 }
 
+TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable_WExist) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_empty"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	int targetAddress = 72;
+	std::string value = buffers.FastRead(targetAddress);
+
+	std::string expected{ "0x12345678" };
+	EXPECT_EQ(expected, value);
+}
+
+TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable_EExist) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_E 72 1"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	int targetAddress = 72;
+	std::string value = buffers.FastRead(targetAddress);
+
+	std::string expected{ "0x00000000" };
+	EXPECT_EQ(expected, value);
+}
+
+
+TEST(TestCommandBuffer, TestFastReadWhenBufferAvailable_ERangeExist) {
+	std::string BUFFER_DIR = "buffer";
+
+	RemoveDirectoryAndRecreate(BUFFER_DIR);
+
+	std::vector<std::string> bufferNames = {
+		{"1_E 3 4"},
+		{"2_W 72 0x12345678" },
+		{"3_E 68 7"},
+		{"4_empty"},
+		{"5_empty"}
+	};
+	MakeBufferFiles(bufferNames, BUFFER_DIR);
+
+	CommandBuffer buffers;
+	int targetAddress = 72;
+	std::string value = buffers.FastRead(targetAddress);
+
+	std::string expected{ "0x00000000" };
+	EXPECT_EQ(expected, value);
+}
+
 TEST(TestCommandBuffer, TestFlushWhenBufferEmpty) {
 	std::string BUFFER_DIR = "buffer";
 

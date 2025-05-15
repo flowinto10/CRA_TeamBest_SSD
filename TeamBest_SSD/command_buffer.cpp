@@ -27,13 +27,25 @@ std::vector<std::string> CommandBuffer::Flush() {
 std::string CommandBuffer::FastRead(int targetAddress) {
 	std::vector<std::string> commandsInBuffer = ReadBuffers();
 
-	for (const auto& command : commandsInBuffer) {
-		auto tokens = BEST_UTILS::StringTokenizer(command);
+	for (auto it = commandsInBuffer.rbegin(); it != commandsInBuffer.rend(); ++it) {
+		auto tokens = BEST_UTILS::StringTokenizer(*it);
 		std::string command = tokens[COMMAND_PARAM_INDEX_WRITE::COMMAND_NAME];
-		int addressInCommand = std::stoi(tokens[COMMAND_PARAM_INDEX_WRITE::ADDRESS]);
-		if (command == WRITE_COMMAND_NAME && targetAddress == addressInCommand) {
-			return tokens[COMMAND_PARAM_INDEX_WRITE::VALUE];
-		}	
+		if (command == WRITE_COMMAND_NAME) {
+			int addressInCommand = std::stoi(tokens[COMMAND_PARAM_INDEX_WRITE::ADDRESS]);
+			if (targetAddress == addressInCommand) {
+				return tokens[COMMAND_PARAM_INDEX_WRITE::VALUE];
+			}
+		}
+		else if(command == ERASE_COMMAND_NAME) {
+			int addressInCommand = std::stoi(tokens[COMMAND_PARAM_INDEX_ERASE::ADDRESS]);
+			int sizeInCommand = std::stoi(tokens[COMMAND_PARAM_INDEX_ERASE::SIZE]);
+
+			int startAddress = addressInCommand;
+			int endAddress = startAddress + sizeInCommand -1;
+			if (targetAddress >= startAddress && targetAddress <= endAddress) {
+				return MEMORY_INIT_VALUE;
+			}			
+		}
 	}
 
 	return {};
