@@ -86,8 +86,9 @@ private:
 	inline static const std::string DELIMITER{ "_" };
 
 	inline static const std::string WRITE_COMMAND_NAME = { "W" };
+	inline static const std::string ERASE_COMMAND_NAME = { "E" };
 
-
+	inline static const std::string MEMORY_INIT_VALUE = { "0x00000000" };
 };
 
 
